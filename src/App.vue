@@ -14,18 +14,25 @@
 
           <div class="ms-auto d-flex" />
 
-          <Spinner />
+          <Spinner v-bind:class="{ 'd-none': showSpinner }" />
           <div class="btn-group">
             <input
               type="checkbox"
               class="btn-check"
               id="autoTranspile"
               autocomplete="off"
+              v-model="autoTranspiling"
             />
             <label class="btn btn-outline-success" for="autoTranspile"
               >Auto</label
             >
-            <button type="button" class="btn btn-success">Transpile</button>
+            <button
+              type="button"
+              class="btn btn-success"
+              v-on:click="transpile()"
+            >
+              Transpile
+            </button>
           </div>
         </div>
         <hr />
@@ -82,16 +89,23 @@ export default {
   },
   data() {
     return {
+      autoTranspiling: true,
       transpiling: false,
-      last_transpile: 0,
+      lastTranspile: 0,
     };
+  },
+  computed: {
+    showSpinner() {
+      return !this.$data.transpiling;
+    },
   },
   methods: {
     ppythonSourceUpdatedValue(value) {
       setTimeout(() => {
         if (
+          this.$data.autoTranspiling &&
           !this.$data.transpiling &&
-          new Date().getTime() - this.$data.last_transpile > 5000
+          new Date().getTime() - this.$data.lastTranspile > 5000
         )
           this.transpile();
       }, 3000);
@@ -99,9 +113,11 @@ export default {
     transpile() {
       this.$data.transpiling = true;
       console.log("t");
-      this.$refs.cppSource.setValue(this.$refs.ppythonSource.getValue());
-      this.$data.transpiling = false;
-      this.$data.last_transpile = new Date().getTime();
+      setTimeout(() => {
+        this.$refs.cppSource.setValue(this.$refs.ppythonSource.getValue());
+        this.$data.transpiling = false;
+        this.$data.lastTranspile = new Date().getTime();
+      }, 600);
     },
   },
   mounted() {
