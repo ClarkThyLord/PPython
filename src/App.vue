@@ -14,7 +14,7 @@
 
           <div class="ms-auto d-flex" />
 
-          <Spinner v-bind:class="{ 'd-none': showSpinner }" />
+          <Spinner v-bind:class="{ 'd-none': !this.$data.transpiling }" />
           <div class="btn-group">
             <input
               type="checkbox"
@@ -48,9 +48,16 @@
           <h1>C++</h1>
 
           <div class="ms-auto btn-group">
-            <button type="button" class="btn btn-primary active">Code</button
-            ><button type="button" class="btn btn-danger position-relative">
-              Errors
+            <button type="button" class="btn btn-primary active">Code</button>
+            <input
+              type="checkbox"
+              class="btn-check"
+              id="showTranspilingLogs"
+              autocomplete="off"
+              v-model="showTranspilingLogs"
+            />
+            <label class="btn btn-outline-secondary" for="showTranspilingLogs">
+              Log
               <span
                 class="
                   position-absolute
@@ -59,12 +66,13 @@
                   translate-middle
                   badge
                   rounded-pill
-                  bg-warning
+                  bg-danger
                 "
+                v-bind:class="{ 'd-none': transpilingLogs.length == 0 }"
               >
-                99+
+                {{ transpilingLogs.length }}
               </span>
-            </button>
+            </label>
           </div>
         </div>
         <hr />
@@ -72,12 +80,21 @@
           placeholder="\\ Get some C++ code here...&#10;int x = 10;&#10;while (x > 0) {&#10;&#9;x = x - 1&#10;}"
           ref="cppSource"
         />
-        <ul class="m-2 list-group overflow-auto" style="max-height: 15vh">
-          <li v-for="i in 100" class="list-group-item list-group-item-danger">
-            A simple danger list group item
-          </li>
-          <li class="list-group-item list-group-item-warning">
-            A simple warning list group item
+        <ul
+          style="max-height: 15vh"
+          class="m-2 list-group overflow-auto"
+          v-bind:class="{ 'd-none': !showTranspilingLogs }"
+        >
+          <li
+            v-for="transpilingLog in transpilingLogs"
+            v-bind:key="transpilingLog"
+            class="list-group-item"
+            v-bind:class="{
+              'list-group-item-danger': transpilingLog.isError,
+              'list-group-item-warning': transpilingLog.isWarning,
+            }"
+          >
+            {{ transpilingLog.message }}
           </li>
         </ul>
       </div>
@@ -100,12 +117,9 @@ export default {
       autoTranspiling: true,
       transpiling: false,
       lastTranspile: 0,
+      transpilingLogs: [],
+      showTranspilingLogs: true,
     };
-  },
-  computed: {
-    showSpinner() {
-      return !this.$data.transpiling;
-    },
   },
   methods: {
     ppythonSourceUpdatedValue(value) {
@@ -123,6 +137,14 @@ export default {
       console.log("t");
       setTimeout(() => {
         this.$refs.cppSource.setValue(this.$refs.ppythonSource.getValue());
+        this.$data.transpilingLogs = [];
+        for (let index = 0; index < Math.floor(Math.random() * 150); index++) {
+          this.$data.transpilingLogs.push({
+            isError: index % 3 == 0,
+            isWarning: index % 3 == 1,
+            message: "hello world!",
+          });
+        }
         this.$data.transpiling = false;
         this.$data.lastTranspile = new Date().getTime();
       }, 600);
