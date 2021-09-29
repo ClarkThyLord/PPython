@@ -65,10 +65,28 @@ export default {
   name: "App",
   components: {
     TextArea,
+  data() {
+    return {
+      transpiling: false,
+      last_transpile: 0,
+    };
   },
   methods: {
     ppythonSourceUpdatedValue(value) {
-      this.$refs.cppSource.setValue(value);
+      setTimeout(() => {
+        if (
+          !this.$data.transpiling &&
+          new Date().getTime() - this.$data.last_transpile > 5000
+        )
+          this.transpile();
+      }, 3000);
+    },
+    transpile() {
+      this.$data.transpiling = true;
+      console.log("t");
+      this.$refs.cppSource.setValue(this.$refs.ppythonSource.getValue());
+      this.$data.transpiling = false;
+      this.$data.last_transpile = new Date().getTime();
     },
   },
   mounted() {
