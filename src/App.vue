@@ -106,6 +106,8 @@
 import TextArea from "./components/text_area.vue";
 import Spinner from "./components/spinner.vue";
 
+import transpiler from "./js/transpiler";
+
 export default {
   name: "App",
   components: {
@@ -134,17 +136,13 @@ export default {
     },
     transpile() {
       this.$data.transpiling = true;
-      console.log("t");
       setTimeout(() => {
-        this.$refs.cppSource.setValue(this.$refs.ppythonSource.getValue());
-        this.$data.transpilingLogs = [];
-        for (let index = 0; index < Math.floor(Math.random() * 150); index++) {
-          this.$data.transpilingLogs.push({
-            isError: index % 3 == 0,
-            isWarning: index % 3 == 1,
-            message: "hello world!",
-          });
-        }
+        let translation = transpiler(this.$refs.ppythonSource.getValue());
+        this.$refs.cppSource.setValue(
+          translation.result ? translation.result : ""
+        );
+        this.$data.transpilingLogs = translation.logs;
+
         this.$data.transpiling = false;
         this.$data.lastTranspile = new Date().getTime();
       }, 600);
