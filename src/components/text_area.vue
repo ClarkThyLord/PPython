@@ -1,5 +1,5 @@
 <template>
-  <textarea :disabled="disabled" :placeholder="placeholder"></textarea>
+  <textarea :placeholder="placeholder"></textarea>
 </template>
 
 <script>
@@ -7,10 +7,6 @@ export default {
   name: "TextArea",
   emits: ["update:value"],
   props: {
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
     placeholder: {
       type: String,
       default: "",
@@ -36,14 +32,10 @@ export default {
       return this.$data.editor ? this.$data.editor.getValue() : undefined;
     },
     setValue(value) {
-      this.$data.editor ? this.$data.editor.setValue(value) : undefined;
+      if (this.$data.editor) this.$data.editor.setValue(value);
     },
-    clearValue() {
-      if (this.$data.editor) {
-        // this.$data.editor.setValue("");
-        // this.$data.editor.clearHistory();
-        // this.$data.editor.swapDoc(codemirror.Doc("", {}));
-      }
+    setReadOnly(value) {
+      if (this.$data.editor) this.$data.editor.options.readOnly = value;
     },
   },
 };

@@ -13,13 +13,6 @@
 
           <a href="#help" class="link-info">?</a>
           <div class="ms-auto btn-group">
-            <button
-              type="button"
-              class="btn btn-danger"
-              v-on:click="ppythonSourceClear"
-            >
-              Clear
-            </button>
             <button type="button" class="btn btn-success">Transpile</button>
           </div>
         </div>
@@ -57,7 +50,6 @@
         </div>
         <hr />
         <TextArea
-          :disabled="true"
           placeholder="\\ Get some C++ code here...&#10;int x = 10;&#10;while (x > 0) {&#10;&#9;x = x - 1&#10;}"
           ref="cppSource"
         />
@@ -78,9 +70,9 @@ export default {
     ppythonSourceUpdatedValue(value) {
       this.$refs.cppSource.setValue(value);
     },
-    ppythonSourceClear() {
-      this.$refs.ppythonSource.clearValue();
-    },
+  },
+  mounted() {
+    this.$refs.cppSource.setReadOnly(true);
   },
 };
 </script>
