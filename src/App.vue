@@ -13,12 +13,22 @@
 
           <a href="#help" class="link-info">?</a>
           <div class="ms-auto btn-group">
-            <button type="button" class="btn btn-danger">Clear</button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              v-on:click="ppythonSourceClear"
+            >
+              Clear
+            </button>
             <button type="button" class="btn btn-success">Transpile</button>
           </div>
         </div>
         <hr />
-        <TextArea v-on:input="ppythonSourceInput" ref="ppythonSource" />
+        <TextArea
+          v-model="ppythonSourceText"
+          v-on:input="ppythonSourceInput"
+          ref="ppythonSource"
+        />
       </div>
 
       <div class="col-lg-6 d-flex flex-column">
@@ -62,6 +72,7 @@ export default {
   },
   data() {
     return {
+      ppythonSourceText: "",
       cppSourceText: "",
     };
   },
@@ -69,8 +80,11 @@ export default {
     this.$refs.ppythonSource.$el.focus();
   },
   methods: {
-    ppythonSourceInput(new_source) {
-      console.log(new_source);
+    ppythonSourceInput(event) {
+      console.log(this.$data.ppythonSourceText);
+    },
+    ppythonSourceClear() {
+      this.$data.ppythonSourceText = "";
     },
   },
 };

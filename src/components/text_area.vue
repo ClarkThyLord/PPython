@@ -3,15 +3,15 @@
     class="form-control flex-fill"
     :disabled="disabled"
     :placeholder="placeholder"
-    v-model="text"
-    v-on:input="$emit('input', text)"
+    :value="modelValue"
+    @input="$emit('update:modelValue', $event.target.value)"
   ></textarea>
 </template>
 
 <script>
 export default {
   name: "TextArea",
-  emits: ["input"],
+  emits: ["update:modelValue"],
   props: {
     disabled: {
       type: Boolean,
@@ -21,7 +21,7 @@ export default {
       type: String,
       default: "",
     },
-    text: {
+    modelValue: {
       type: String,
       default: "",
     },
