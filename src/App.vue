@@ -125,15 +125,11 @@ export default {
   },
   methods: {
     ppythonSourceUpdatedValue(value) {
+      if (!this.$data.autoTranspiling) return;
       this.$data.edits += 1;
       setTimeout(() => {
         this.$data.edits -= 1;
-        if (
-          this.$data.edits === 0 &&
-          this.$data.autoTranspiling &&
-          !this.$data.transpiling
-        )
-          this.transpile();
+        if (this.$data.edits === 0 && !this.$data.transpiling) this.transpile();
       }, 3000);
     },
     transpile() {

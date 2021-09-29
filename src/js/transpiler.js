@@ -21,6 +21,10 @@ export default function transpiler(ppython_source) {
 
     // TODO transpiler logic
 
+    if (cpp_source === undefined) {
+        logErrorMessage("Error: No source code")
+    }
+
     return {
         result: cpp_source,
         logs: logs
