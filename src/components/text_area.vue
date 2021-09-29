@@ -24,6 +24,7 @@ export default {
     editor.on("change", (instance, changeObj) => {
       this.$emit("update:value", this.getValue());
     });
+    editor.getWrapperElement().classList.add("overflow-auto");
     editor.getWrapperElement().classList.add("flex-fill");
     editor.getWrapperElement().classList.add("rounded-2");
     this.$data.editor = editor;

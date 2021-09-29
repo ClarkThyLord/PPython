@@ -72,6 +72,14 @@
           placeholder="\\ Get some C++ code here...&#10;int x = 10;&#10;while (x > 0) {&#10;&#9;x = x - 1&#10;}"
           ref="cppSource"
         />
+        <ul class="m-2 list-group overflow-auto" style="max-height: 15vh">
+          <li v-for="i in 100" class="list-group-item list-group-item-danger">
+            A simple danger list group item
+          </li>
+          <li class="list-group-item list-group-item-warning">
+            A simple warning list group item
+          </li>
+        </ul>
       </div>
     </div>
   </div>
