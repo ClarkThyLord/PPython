@@ -18,7 +18,7 @@
           </div>
         </div>
         <hr />
-        <TextArea ref="ppythonSource" />
+        <TextArea v-on:input="ppythonSourceInput" ref="ppythonSource" />
       </div>
 
       <div class="col-lg-6 d-flex flex-column">
@@ -46,7 +46,7 @@
           </div>
         </div>
         <hr />
-        <TextArea :disabled="true" ref="cppSource" />
+        <TextArea :disabled="true" :text="cppSourceText" ref="cppSource" />
       </div>
     </div>
   </div>
@@ -60,8 +60,18 @@ export default {
   components: {
     TextArea,
   },
+  data() {
+    return {
+      cppSourceText: "",
+    };
+  },
   mounted() {
     this.$refs.ppythonSource.$el.focus();
+  },
+  methods: {
+    ppythonSourceInput(new_source) {
+      console.log(new_source);
+    },
   },
 };
 </script>
