@@ -10,9 +10,21 @@
             class="d-inline-block align-text-top ppython-icon"
           />
           <h1>PPython</h1>
-
           <a href="#help" class="link-info">?</a>
-          <div class="ms-auto btn-group">
+
+          <div class="ms-auto d-flex" />
+
+          <Spinner />
+          <div class="btn-group">
+            <input
+              type="checkbox"
+              class="btn-check"
+              id="autoTranspile"
+              autocomplete="off"
+            />
+            <label class="btn btn-outline-success" for="autoTranspile"
+              >Auto</label
+            >
             <button type="button" class="btn btn-success">Transpile</button>
           </div>
         </div>
@@ -60,11 +72,14 @@
 
 <script>
 import TextArea from "./components/text_area.vue";
+import Spinner from "./components/spinner.vue";
 
 export default {
   name: "App",
   components: {
     TextArea,
+    Spinner,
+  },
   data() {
     return {
       transpiling: false,
