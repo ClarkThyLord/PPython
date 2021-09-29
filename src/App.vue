@@ -116,20 +116,22 @@ export default {
   },
   data() {
     return {
+      edits: 0,
       autoTranspiling: true,
       transpiling: false,
-      lastTranspile: 0,
       transpilingLogs: [],
       showTranspilingLogs: true,
     };
   },
   methods: {
     ppythonSourceUpdatedValue(value) {
+      this.$data.edits += 1;
       setTimeout(() => {
+        this.$data.edits -= 1;
         if (
+          this.$data.edits === 0 &&
           this.$data.autoTranspiling &&
-          !this.$data.transpiling &&
-          new Date().getTime() - this.$data.lastTranspile > 5000
+          !this.$data.transpiling
         )
           this.transpile();
       }, 3000);
@@ -144,7 +146,6 @@ export default {
         this.$data.transpilingLogs = translation.logs;
 
         this.$data.transpiling = false;
-        this.$data.lastTranspile = new Date().getTime();
       }, 600);
     },
   },
