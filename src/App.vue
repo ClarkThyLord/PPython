@@ -25,6 +25,7 @@
         </div>
         <hr />
         <TextArea
+          placeholder="# Write some PPython code here...&#10;x = 10&#10;while x > 0:&#10;&#9;x = x - 1"
           v-model="ppythonSourceText"
           v-on:input="ppythonSourceInput"
           ref="ppythonSource"
@@ -56,7 +57,12 @@
           </div>
         </div>
         <hr />
-        <TextArea :disabled="true" :text="cppSourceText" ref="cppSource" />
+        <TextArea
+          :disabled="true"
+          placeholder="\\ Get some C++ code here...&#10;int x = 10;&#10;while (x > 0) {&#10;&#9;x = x - 1&#10;}"
+          :text="cppSourceText"
+          ref="cppSource"
+        />
       </div>
     </div>
   </div>
