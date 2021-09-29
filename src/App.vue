@@ -26,8 +26,7 @@
         <hr />
         <TextArea
           placeholder="# Write some PPython code here...&#10;x = 10&#10;while x > 0:&#10;&#9;x = x - 1"
-          v-model="ppythonSourceText"
-          v-on:input="ppythonSourceInput"
+          v-on:update:value="ppythonSourceUpdatedValue"
           ref="ppythonSource"
         />
       </div>
@@ -60,7 +59,6 @@
         <TextArea
           :disabled="true"
           placeholder="\\ Get some C++ code here...&#10;int x = 10;&#10;while (x > 0) {&#10;&#9;x = x - 1&#10;}"
-          :text="cppSourceText"
           ref="cppSource"
         />
       </div>
@@ -76,21 +74,12 @@ export default {
   components: {
     TextArea,
   },
-  data() {
-    return {
-      ppythonSourceText: "",
-      cppSourceText: "",
-    };
-  },
-  mounted() {
-    this.$refs.ppythonSource.$el.focus();
-  },
   methods: {
-    ppythonSourceInput(event) {
-      console.log(this.$data.ppythonSourceText);
+    ppythonSourceUpdatedValue(value) {
+      this.$refs.cppSource.setValue(value);
     },
     ppythonSourceClear() {
-      this.$data.ppythonSourceText = "";
+      this.$refs.ppythonSource.clearValue();
     },
   },
 };
