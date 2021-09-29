@@ -10,7 +10,12 @@
             class="d-inline-block align-text-top ppython-icon"
           />
           <h1>PPython</h1>
-          <a href="#help" class="link-info">?</a>
+          <a
+            href="https://github.com/ClarkThyLord/PPython#readme"
+            class="link-info"
+          >
+            ?
+          </a>
 
           <div class="ms-auto d-flex" />
 
@@ -23,9 +28,9 @@
               autocomplete="off"
               v-model="autoTranspiling"
             />
-            <label class="btn btn-outline-success" for="autoTranspile"
-              >Auto</label
-            >
+            <label class="btn btn-outline-success" for="autoTranspile">
+              Auto
+            </label>
             <button
               type="button"
               class="btn btn-success"
