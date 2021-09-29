@@ -17,7 +17,7 @@
 	</a>
 </p>
 
-> Simple online Python to C++ transpilar
+> PPython to C++ web transpilar
 
 ---
 
