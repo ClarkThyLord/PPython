@@ -22,7 +22,7 @@ export default function transpiler(ppython_source) {
     // TODO transpiler logic
 
     if (cpp_source === undefined) {
-        logErrorMessage("Error: No source code")
+        logErrorMessage("Error: No C++ source code could be produced")
     }
 
     return {

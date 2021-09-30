@@ -17,7 +17,7 @@
 	</a>
 </p>
 
-> PPython to C++ web transpilar
+> PPython to C++ web transpiler
 
 ---
 
