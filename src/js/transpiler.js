@@ -19,7 +19,13 @@ export default function transpiler(ppython_source) {
         })
     }
 
-    // TODO transpiler logic
+    let raw_tokens = ppython_source
+        .replaceAll("\n", " \n ")
+        .replaceAll("\t", " \t ")
+        .replaceAll(":", " : ")
+        .split(/[ ]+/).filter(n => n);
+
+    cpp_source = JSON.stringify(raw_tokens, null, "\t");
 
     if (cpp_source === undefined) {
         logErrorMessage("Error: No C++ source code could be produced")
