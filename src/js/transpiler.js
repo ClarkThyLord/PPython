@@ -1,6 +1,7 @@
 export default function transpiler(ppython_source) {
     let cpp_source = undefined;
     let logs = []
+
     const logMessage = (message) => {
         logs.push({
             message: message
@@ -19,26 +20,9 @@ export default function transpiler(ppython_source) {
         })
     }
 
-    let raw_tokens = ppython_source
-        .replaceAll("\n", " \n ")
-        .replaceAll("\t", " \t ")
-        .replaceAll(":", " : ")
-        .replaceAll("(", " ( ")
-        .replaceAll(")", " ) ")
-        .replaceAll("=", " = ")
-        .replaceAll("<", " < ")
-        .replaceAll(">", " > ")
-        .replaceAll("==", " == ")
-        .replaceAll("!=", " != ")
-        .replaceAll("*", " * ")
-        .replaceAll("+", " + ")
-        .replaceAll("-", " - ")
-        .replaceAll("/", " / ")
-        .split(/[ ]+/).filter(n => n);
-
-    var TokenExpressions = {
+    const TokenExpressions = {
         "identifier": {
-            "variable_name": /(?<!.)[^d][a-zA-Z]*(?!.)/,
+            "variable_name": /(?<!.)[^0-9]\w*(?!.)/,
         },
         "keyword": {
             "and": /(?<!.)and(?!.)/,
@@ -76,16 +60,32 @@ export default function transpiler(ppython_source) {
         },
     };
 
+    let raw_tokens = ppython_source
+        .replaceAll("\n", " \n ")
+        .replaceAll("\t", " \t ")
+        .replaceAll(":", " : ")
+        .replaceAll("(", " ( ")
+        .replaceAll(")", " ) ")
+        .replaceAll("=", " = ")
+        .replaceAll("<", " < ")
+        .replaceAll(">", " > ")
+        .replaceAll("==", " == ")
+        .replaceAll("!=", " != ")
+        .replaceAll("*", " * ")
+        .replaceAll("+", " + ")
+        .replaceAll("-", " - ")
+        .replaceAll("/", " / ")
+        .split(/[ ]+/).filter(n => n);
+
+    console.log(JSON.stringify(raw_tokens));
+
     let lexical_tokens = [];
 
     raw_tokens.forEach(raw_token => {
-        console.log(raw_token);
         let match = undefined;
         Object.keys(TokenExpressions).some(token_name => {
-            console.log(token_name);
-            Object.keys(TokenExpressions[token_name]).some(token_expression => {
+            Object.values(TokenExpressions[token_name]).some(token_expression => {
                 match = raw_token.match(token_expression);
-                console.log("Match: ", match);
                 if (match !== null && match.length == 1) {
                     lexical_tokens.push([token_name, raw_token]);
                     return true;
