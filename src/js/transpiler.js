@@ -21,9 +21,6 @@ export default function transpiler(ppython_source) {
     }
 
     const TokenExpressions = {
-        "identifier": {
-            "variable_name": /(?<!.)[^0-9]\w*(?!.)/,
-        },
         "keyword": {
             "and": /(?<!.)and(?!.)/,
             "or": /(?<!.)or(?!.)/,
@@ -38,6 +35,8 @@ export default function transpiler(ppython_source) {
             "parenthesis_left": /(?<!.)[(](?!.)/,
             "parenthesis_right": /(?<!.)[)](?!.)/,
             "colon": /(?<!.):(?!.)/,
+            "newline": /(?<!.)\n(?!.)/,
+            "tab": /(?<!.)\t(?!.)/,
         },
         "operator": {
             "addition": /(?<!.)[+](?!.)/,
@@ -57,6 +56,9 @@ export default function transpiler(ppython_source) {
         },
         "comment": {
             "line": /#.*/,
+        },
+        "identifier": {
+            "variable_name": /(?<!.)[^0-9]\w*(?!.)/,
         },
     };
 
