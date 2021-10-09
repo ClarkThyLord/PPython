@@ -39,65 +39,134 @@ export default function transpiler(ppython_source) {
     //Logger to check what the word means
     var TokenExpressions = {
         "identifier": {
-            "variable_name": /(?<!.)([^d][a-zA-Z]*)(?!.)/,
+            "variable_name": /(?<!.)[^d][a-zA-Z]*(?!.)/,
         },
         "keyword": {
-            "and": /(?<!.)(and)(?!.)/,
-            "or": /(?<!.)(or)(?!.)/,
-            "if": /(?<!.)(if)(?!.)/,
-            "elif": /(?<!.)(elif)(?!.)/,
-            "else": /(?<!.)(else)(?!.)/,
-            "while": /(?<!.)(while)(?!.)/,
-            "break": /(?<!.)(break)(?!.)/,
-            "return": /(?<!.)(return)(?!.)/,
+            "and": /(?<!.)and(?!.)/,
+            "or": /(?<!.)or(?!.)/,
+            "if": /(?<!.)if(?!.)/,
+            "elif": /(?<!.)elif(?!.)/,
+            "else": /(?<!.)else(?!.)/,
+            "while": /(?<!.)while(?!.)/,
+            "break": /(?<!.)break(?!.)/,
+            "return": /(?<!.)return(?!.)/,
         },
         "separator": {
-            "parenthesis_left": /(?<!.)([(])(?!.)/,
-            "parenthesis_right": /(?<!.)([)])(?!.)/,
-            "colon": /(?<!.)(:)(?!.)/,
+            "parenthesis_left": /(?<!.)[(](?!.)/,
+            "parenthesis_right": /(?<!.)[)](?!.)/,
+            "colon": /(?<!.):(?!.)/,
         },
         "operator": {
             "addition": /(?<!.)[+](?!.)/,
             "subtraction": /(?<!.)[-](?!.)/,
             "multiplication": /(?<!.)[*](?!.)/,
             "division": /(?<!.)[/](?!.)/,
-            "assignment": /(?<!.)(=)(?!.)/,
-            "equals": /(?<!.)(==)(?!.)/,
-            "diffrent": /(?<!.)(!=)(?!.)/,
+            "assignment": /(?<!.)=(?!.)/,
+            "equals": /(?<!.)==(?!.)/,
+            "diffrent": /(?<!.)!=(?!.)/,
             "greater": /(?<!.)[>](?!.)/,
-            "greater_equal": /(?<!.)(>=)(?!.)/,
             "lesser": /(?<!.)[<](?!.)/,
-            "lesser_equal": /(?<!.)(<=)(?!.)/,
         },
         "literal": {
-            "bool": /(?<!.)(True|False)(?!.)/,
-            "string": /(?<!.)(".*")(?!.)/,
+            "bool": /(?<!.)True|False(?!.)/,
+            "string": /(?<!.)".*"(?!.)/,
             "integer": /(?<!.)[0-9]+(?!.)/,
         },
         "comment": {
-            "line": /(\s(#[a-zA-Z0-9]*))/,
+            "line": /#.*/,
         },
     };
+
+    let tokens = [];
 
     let state = 0;
     let token_lex;
 
-    console.log(raw_tokens)
-
     for (let i = 0; i < raw_tokens.length; i++) {
         const raw_token = raw_tokens[i];
-        switch (state) {
-            case 0:
-                for (const token_name in TokenExpressions["keyword"]) {
-                    const token_expression = TokenExpressions["keyword"][token_name];
-                    console.log(raw_token.match(token_expression))
-                }
-                break;
-        }
+        console.log(raw_token);
 
+        for (let state = 0; state < Object.keys(TokenExpressions).length; state++) {
+            if (state == -1)
+                break;
+            console.log(state);
+            switch (state) {
+                case 0:
+                    for (const token_name in TokenExpressions["keyword"]) {
+                        const token_expression = TokenExpressions["keyword"][token_name];
+                        let match = raw_token.match(token_expression);
+                        console.log(match);
+                        if (match !== null && match.length == 1) {
+                            tokens.push(["keyword", raw_token])
+                            state = -1;
+                            break;
+                        }
+                    }
+                    break;
+                case 1:
+                    for (const token_name in TokenExpressions["operator"]) {
+                        const token_expression = TokenExpressions["operator"][token_name];
+                        let match = raw_token.match(token_expression);
+                        if (match !== null && match.length == 1) {
+                            tokens.push(["operator", raw_token]);
+                            state = -1;
+                            break;
+                        }
+                    }
+                    break;
+                case 2:
+                    for (const token_name in TokenExpressions["seperator"]) {
+                        const token_expression = TokenExpressions["seperator"][token_name];
+                        let match = raw_token.match(token_expression);
+                        if (match !== null && match.length == 1) {
+                            tokens.push(["seperator", raw_token])
+                            state = -1;
+                            break;
+                        }
+                    }
+                    break;
+                case 3:
+                    for (const token_name in TokenExpressions["literal"]) {
+                        const token_expression = TokenExpressions["literal"][token_name];
+                        let match = raw_token.match(token_expression);
+                        if (match !== null && match.length == 1) {
+                            tokens.push(["literal", raw_token]);
+                            state = -1;
+                            break;
+                        }
+                    }
+                    break;
+                case 4:
+                    for (const token_name in TokenExpressions["comment"]) {
+                        const token_expression = TokenExpressions["comment"][token_name];
+                        let match = raw_token.match(token_expression);
+                        if (match !== null && match.length == 1) {
+                            tokens.push(["comment", raw_token]);
+                            state = -1;
+                            break;
+                        }
+                    }
+                    break;
+                case 5:
+                    for (const token_name in TokenExpressions["identifier"]) {
+                        const token_expression = TokenExpressions["identifier"][token_name];
+                        let match = raw_token.match(token_expression);
+                        if (match !== null && match.length == 1) {
+                            tokens.push(["identifier", raw_token]);
+                            state = -1;
+                            break;
+                        }
+                    }
+                    break;
+                case -1:
+                    break;
+                default:
+                    logErrorMessage("Error: Syntax error `" + raw_token + "`")
+            }
+        }
     }
 
-    cpp_source = JSON.stringify(raw_tokens, null, "\t");
+    cpp_source = JSON.stringify(tokens, null, "\t");
 
     if (cpp_source === undefined) {
         logErrorMessage("Error: No C++ source code could be produced")
