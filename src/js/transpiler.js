@@ -26,79 +26,77 @@ export default function transpiler(ppython_source) {
         .replaceAll("(", " ( ")
         .replaceAll(")", " ) ")
         .replaceAll("=", " = ")
-        .replaceAll("<=", " <= ")
         .replaceAll("<", " < ")
         .replaceAll(">", " > ")
-        .replaceAll(">=", " >= ")
         .replaceAll("==", " == ")
         .replaceAll("!=", " != ")
         .replaceAll("*", " * ")
         .replaceAll("+", " + ")
         .replaceAll("-", " - ")
-        .replaceAll("/", " / ") 
+        .replaceAll("/", " / ")
         .split(/[ ]+/).filter(n => n);
 
     //Logger to check what the word means
-    var TokenExpressions = {};
+    var TokenExpressions = {
+        "identifier": {
+            "variable_name": /(?<!.)([^d][a-zA-Z]*)(?!.)/,
+        },
+        "keyword": {
+            "and": /(?<!.)(and)(?!.)/,
+            "or": /(?<!.)(or)(?!.)/,
+            "if": /(?<!.)(if)(?!.)/,
+            "elif": /(?<!.)(elif)(?!.)/,
+            "else": /(?<!.)(else)(?!.)/,
+            "while": /(?<!.)(while)(?!.)/,
+            "break": /(?<!.)(break)(?!.)/,
+            "return": /(?<!.)(return)(?!.)/,
+        },
+        "separator": {
+            "parenthesis_left": /(?<!.)([(])(?!.)/,
+            "parenthesis_right": /(?<!.)([)])(?!.)/,
+            "colon": /(?<!.)(:)(?!.)/,
+        },
+        "operator": {
+            "addition": /(?<!.)[+](?!.)/,
+            "subtraction": /(?<!.)[-](?!.)/,
+            "multiplication": /(?<!.)[*](?!.)/,
+            "division": /(?<!.)[/](?!.)/,
+            "assignment": /(?<!.)(=)(?!.)/,
+            "equals": /(?<!.)(==)(?!.)/,
+            "diffrent": /(?<!.)(!=)(?!.)/,
+            "greater": /(?<!.)[>](?!.)/,
+            "greater_equal": /(?<!.)(>=)(?!.)/,
+            "lesser": /(?<!.)[<](?!.)/,
+            "lesser_equal": /(?<!.)(<=)(?!.)/,
+        },
+        "literal": {
+            "bool": /(?<!.)(True|False)(?!.)/,
+            "string": /(?<!.)(".*")(?!.)/,
+            "integer": /(?<!.)[0-9]+(?!.)/,
+        },
+        "comment": {
+            "line": /(\s(#[a-zA-Z0-9]*))/,
+        },
+    };
 
-
-    let RegInt = /(?<!.)(Int)(?!.)/;
-    let RegIntVal = /(?<!.)[0-9]+(?!.)/;
-    let RegStr = /(?<!.)(String)(?!.)/;
-    let RegStrVal = /(?<!.)(".*")(?!.)/;
-    let RegBul = /(?<!.)(Bool)(?!.)/;
-    let RegBulVal = /(?<!.)(True|False)(?!.)/;
-    let RegSum = /(?<!.)[+](?!.)/;
-    let RegSub = /(?<!.)[-](?!.)/;
-    let RegMlt = /(?<!.)[*](?!.)/;
-    let RegDiv = /(?<!.)[/](?!.)/;
-    let RegEql = /(?<!.)(==)(?!.)/;
-    let RegAsn = /(?<!.)(=)(?!.)/;
-    let RegDif = /(?<!.)(!=)(?!.)/;
-    let RegGrt = /(?<!.)[>](?!.)/;
-    let RegGte = /(?<!.)(>=)(?!.)/;
-    let RegLwt = /(?<!.)[<](?!.)/;
-    let RegLte = /(?<!.)(<=)(?!.)/;
-    let RegAnd = /(?<!.)(and)(?!.)/;
-    let RegOor = /(?<!.)(or)(?!.)/;
-    let RegWle = /(?<!.)(While)(?!.)/;
-    let RegIff = /(?<!.)(If)(?!.)/;
-    let RegEls = /(?<!.)(Else)(?!.)/;
-    let RegLif = /(?<!.)(Elif)(?!.)/;
-    let RegRtn = /(?<!.)([^\\d][a-zA-Z0-9]*)(?!.)/;
-    let RegBrk = /(?<!.)(Break)(?!.)/;
-    let RegVar = /(?<!.)([^d][a-zA-Z]*)(?!.)/;
-    let RegCom = /(\s(#[a-zA-Z0-9]*))/;
-    let RegDdt = /(?<!.)(:)(?!.)/;
-    let RegRgt =  /(?<!.)([(])(?!.)/;
-    let RegLft =  /(?<!.)([)])(?!.)/;  
-
-    
     let state = 0;
     let token_lex;
-   
-    for (let i = 0; i < raw_tokens.length; i++) { 
-        switch(state){
-            case 0: 
 
-            break;
-            case 1: 
+    console.log(raw_tokens)
 
-            break;
-            case 2:
-
-             
-
-            break;
-            case 3:
-
-             
-
-            break;
+    for (let i = 0; i < raw_tokens.length; i++) {
+        const raw_token = raw_tokens[i];
+        switch (state) {
+            case 0:
+                for (const token_name in TokenExpressions["keyword"]) {
+                    const token_expression = TokenExpressions["keyword"][token_name];
+                    console.log(raw_token.match(token_expression))
+                }
+                break;
         }
-        
+
     }
-    
+
     cpp_source = JSON.stringify(raw_tokens, null, "\t");
 
     if (cpp_source === undefined) {
