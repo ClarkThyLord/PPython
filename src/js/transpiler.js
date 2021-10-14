@@ -21,24 +21,32 @@ export default function transpiler(ppython_source) {
     }
 
     const TokenExpressions = {
-        "keyword": {
+        "Estructura de Iteracion": { 
+            "while": /(?<!.)while(?!.)/, 
+        },
+        "Operador Logico": {
             "and": /(?<!.)and(?!.)/,
-            "or": /(?<!.)or(?!.)/,
+            "or": /(?<!.)or(?!.)/, 
+        },
+        "Estructura Condicional": { 
             "if": /(?<!.)if(?!.)/,
             "elif": /(?<!.)elif(?!.)/,
-            "else": /(?<!.)else(?!.)/,
-            "while": /(?<!.)while(?!.)/,
+            "else": /(?<!.)else(?!.)/, 
+        },
+        "Funcion Auxilliar": { 
             "break": /(?<!.)break(?!.)/,
             "return": /(?<!.)return(?!.)/,
         },
-        "separator": {
+        "Delimitador Emparejado": {
             "parenthesis_left": /(?<!.)[(](?!.)/,
-            "parenthesis_right": /(?<!.)[)](?!.)/,
+            "parenthesis_right": /(?<!.)[)](?!.)/, 
+        },
+        "Delimitador": { 
             "colon": /(?<!.):(?!.)/,
             "newline": /(?<!.)\n(?!.)/,
             "tab": /(?<!.)\t(?!.)/,
         },
-        "operator": {
+        "operador de comparacion": {
             "addition": /(?<!.)[+](?!.)/,
             "subtraction": /(?<!.)[-](?!.)/,
             "multiplication": /(?<!.)[*](?!.)/,
@@ -49,15 +57,21 @@ export default function transpiler(ppython_source) {
             "greater": /(?<!.)[>](?!.)/,
             "lesser": /(?<!.)[<](?!.)/,
         },
+        "operador aritmetico": {
+            "addition": /(?<!.)[+](?!.)/,
+            "subtraction": /(?<!.)[-](?!.)/,
+            "multiplication": /(?<!.)[*](?!.)/,
+            "division": /(?<!.)[/](?!.)/,
+        },
         "literal": {
             "bool": /(?<!.)True|False(?!.)/,
             "string": /(?<!.)".*"(?!.)/,
             "integer": /(?<!.)[0-9]+(?!.)/,
         },
-        "comment": {
+        "comentario": {
             "line": /#.*/,
         },
-        "identifier": {
+        "identificador": {
             "variable_name": /(?<!.)[^0-9]\w*(?!.)/,
         },
     };
