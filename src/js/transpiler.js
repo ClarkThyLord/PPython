@@ -21,32 +21,32 @@ export default function transpiler(ppython_source) {
     }
 
     const TokenExpressions = {
-        "Estructura de Iteracion": { 
-            "while": /(?<!.)while(?!.)/, 
+        "EstructuraDeIteracion": {
+            "while": /(?<!.)while(?!.)/,
         },
-        "Operador Logico": {
+        "OperadorLogico": {
             "and": /(?<!.)and(?!.)/,
-            "or": /(?<!.)or(?!.)/, 
+            "or": /(?<!.)or(?!.)/,
         },
-        "Estructura Condicional": { 
+        "EstructuraCondicional": {
             "if": /(?<!.)if(?!.)/,
             "elif": /(?<!.)elif(?!.)/,
-            "else": /(?<!.)else(?!.)/, 
+            "else": /(?<!.)else(?!.)/,
         },
-        "Funcion Auxilliar": { 
+        "FuncionAuxilliar": {
             "break": /(?<!.)break(?!.)/,
             "return": /(?<!.)return(?!.)/,
         },
-        "Delimitador Emparejado": {
+        "DelimitadorEmparejado": {
             "parenthesis_left": /(?<!.)[(](?!.)/,
-            "parenthesis_right": /(?<!.)[)](?!.)/, 
+            "parenthesis_right": /(?<!.)[)](?!.)/,
         },
-        "Delimitador": { 
+        "Delimitador": {
             "colon": /(?<!.):(?!.)/,
             "newline": /(?<!.)\n(?!.)/,
             "tab": /(?<!.)\t(?!.)/,
         },
-        "operador de comparacion": {
+        "OperadorDeComparacion": {
             "addition": /(?<!.)[+](?!.)/,
             "subtraction": /(?<!.)[-](?!.)/,
             "multiplication": /(?<!.)[*](?!.)/,
@@ -57,21 +57,21 @@ export default function transpiler(ppython_source) {
             "greater": /(?<!.)[>](?!.)/,
             "lesser": /(?<!.)[<](?!.)/,
         },
-        "operador aritmetico": {
+        "OperadorAritmetico": {
             "addition": /(?<!.)[+](?!.)/,
             "subtraction": /(?<!.)[-](?!.)/,
             "multiplication": /(?<!.)[*](?!.)/,
             "division": /(?<!.)[/](?!.)/,
         },
-        "literal": {
+        "Literal": {
             "bool": /(?<!.)True|False(?!.)/,
             "string": /(?<!.)".*"(?!.)/,
             "integer": /(?<!.)[0-9]+(?!.)/,
         },
-        "comentario": {
+        "Comentario": {
             "line": /#.*/,
         },
-        "identificador": {
+        "Identificador": {
             "variable_name": /(?<!.)[^0-9]\w*(?!.)/,
         },
     };
