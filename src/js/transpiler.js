@@ -45,6 +45,7 @@ export default function transpiler(ppython_source) {
             "single quotes": /(?<!.)'(?!.)/,
             "double quotes": /(?<!.)"(?!.)/,
             "colon": /(?<!.):(?!.)/,
+            "line_comment": /#/,
             "newline": /(?<!.)\n(?!.)/,
             "tab": /(?<!.)\t(?!.)/,
         },
@@ -72,7 +73,6 @@ export default function transpiler(ppython_source) {
             "variable_name": /(?<!.)[^0-9]\w*(?!.)/,
         },
         "Comentario": {
-            "line": /#.*/,
             "comment": /.*/,
         },
     };
@@ -81,6 +81,7 @@ export default function transpiler(ppython_source) {
         .replaceAll("'", " ' ")
         .replaceAll('"', ' " ')
         .replaceAll(":", " : ")
+        .replaceAll("#", " # ")
         .replaceAll("\n", " \n ")
         .replaceAll("\t", " \t ")
         .replaceAll("(", " ( ")
