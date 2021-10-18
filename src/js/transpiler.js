@@ -42,16 +42,16 @@ export default function transpiler(ppython_source) {
             "parenthesis_right": /(?<!.)[)](?!.)/,
         },
         "Delimitador": {
+            "single quotes": /(?<!.)'(?!.)/,
+            "double quotes": /(?<!.)"(?!.)/,
             "colon": /(?<!.):(?!.)/,
             "newline": /(?<!.)\n(?!.)/,
             "tab": /(?<!.)\t(?!.)/,
         },
-        "OperadorDeComparacion": {
-            "addition": /(?<!.)[+](?!.)/,
-            "subtraction": /(?<!.)[-](?!.)/,
-            "multiplication": /(?<!.)[*](?!.)/,
-            "division": /(?<!.)[/](?!.)/,
+        "OperadorDeAsignacion": {
             "assignment": /(?<!.)=(?!.)/,
+        },
+        "OperadorDeComparacion": {
             "equals": /(?<!.)==(?!.)/,
             "diffrent": /(?<!.)!=(?!.)/,
             "greater": /(?<!.)[>](?!.)/,
@@ -68,18 +68,21 @@ export default function transpiler(ppython_source) {
             "string": /(?<!.)".*"(?!.)/,
             "integer": /(?<!.)[0-9]+(?!.)/,
         },
-        "Comentario": {
-            "line": /#.*/,
-        },
         "Identificador": {
             "variable_name": /(?<!.)[^0-9]\w*(?!.)/,
+        },
+        "Comentario": {
+            "line": /#.*/,
+            "comment": /.*/,
         },
     };
 
     let raw_tokens = ppython_source
+        .replaceAll("'", " ' ")
+        .replaceAll('"', ' " ')
+        .replaceAll(":", " : ")
         .replaceAll("\n", " \n ")
         .replaceAll("\t", " \t ")
-        .replaceAll(":", " : ")
         .replaceAll("(", " ( ")
         .replaceAll(")", " ) ")
         .replaceAll("=", " = ")
