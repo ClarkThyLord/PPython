@@ -135,7 +135,7 @@ export default {
       setTimeout(() => {
         this.$data.edits -= 1;
         if (this.$data.edits === 0 && !this.$data.transpiling) this.transpile();
-      }, 3000);
+      }, 2000);
     },
     transpile() {
       this.$data.transpiling = true;
