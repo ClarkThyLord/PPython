@@ -1,4 +1,4 @@
 module.exports = {
-  publicPath: 'PPython/',
+  publicPath: './',
   outputDir: 'docs'
 }
