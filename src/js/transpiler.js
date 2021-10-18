@@ -21,6 +21,13 @@ export default function transpiler(ppython_source) {
     }
 
     const TokenExpressions = {
+        "Delimitador": {
+            "quote": /(?<!.)['"](?!.)/,
+            "colon": /(?<!.)[:](?!.)/,
+            "hashtag": /(?<!.)[#](?!.)/,
+            "newline": /(?<!.)\n(?!.)/,
+            "tab": /(?<!.)\t(?!.)/,
+        },
         "EstructuraDeIteracion": {
             "while": /(?<!.)while(?!.)/,
         },
@@ -41,14 +48,6 @@ export default function transpiler(ppython_source) {
             "parenthesis_left": /(?<!.)[(](?!.)/,
             "parenthesis_right": /(?<!.)[)](?!.)/,
         },
-        "Delimitador": {
-            "single quotes": /(?<!.)'(?!.)/,
-            "double quotes": /(?<!.)"(?!.)/,
-            "colon": /(?<!.):(?!.)/,
-            "line_comment": /#/,
-            "newline": /(?<!.)\n(?!.)/,
-            "tab": /(?<!.)\t(?!.)/,
-        },
         "OperadorDeAsignacion": {
             "assignment": /(?<!.)=(?!.)/,
         },
@@ -66,15 +65,11 @@ export default function transpiler(ppython_source) {
         },
         "Literal": {
             "bool": /(?<!.)True|False(?!.)/,
-            "string": /(?<!.)".*"(?!.)/,
             "integer": /(?<!.)[0-9]+(?!.)/,
         },
         "Identificador": {
             "variable_name": /(?<!.)[^0-9]\w*(?!.)/,
-        },
-        "Comentario": {
-            "comment": /.*/,
-        },
+        }
     };
 
     let raw_tokens = ppython_source
@@ -101,13 +96,49 @@ export default function transpiler(ppython_source) {
 
     let lexical_tokens = [];
 
+    let flag_comment = false;
+    let flag_string = false;
+
     raw_tokens.forEach(raw_token => {
-        let match = undefined;
-        Object.keys(TokenExpressions).some(token_name => {
-            Object.values(TokenExpressions[token_name]).some(token_expression => {
+        let match = null;
+        Object.keys(TokenExpressions).some(token_group => {
+            Object.keys(TokenExpressions[token_group]).some(token_name => {
+                const token_expression = TokenExpressions[token_group][token_name];
+
                 match = raw_token.match(token_expression);
                 if (match !== null && match.length == 1) {
-                    lexical_tokens.push([token_name, raw_token]);
+                    if (token_name == "quote") {
+                        match = [raw_token];
+                        flag_string = !flag_string;
+                        lexical_tokens.push([token_group, token_name, raw_token]);
+                        return true;
+                    }
+                    if (token_name == "hashtag") {
+                        match = [raw_token];
+                        flag_comment = true;
+                        lexical_tokens.push([token_group, token_name, raw_token]);
+                        return true;
+                    }
+                    if (token_name == "newline" && flag_comment) {
+                        match = [raw_token];
+                        flag_comment = false;
+                        lexical_tokens.push([token_group, token_name, raw_token]);
+                        return true;
+                    }
+                }
+
+                if (flag_string) {
+                    match = [raw_token]
+                    lexical_tokens.push(["Literal", "string", raw_token]);
+                    return true;
+                } else if (flag_comment) {
+                    match = [raw_token]
+                    lexical_tokens.push(["Comentario", "comment", raw_token]);
+                    return true;
+                }
+
+                if (match !== null && match.length == 1) {
+                    lexical_tokens.push([token_group, token_name, raw_token]);
                     return true;
                 }
             });
