@@ -146,7 +146,7 @@ export default function transpiler(ppython_source) {
                 return true;
         });
         if (!match)
-            logErrorMessage("Error: Syntax error");
+            logErrorMessage("Error: Syntax error `", raw_token, "`");
     });
 
     cpp_source = JSON.stringify(lexical_tokens, null, "\t");
