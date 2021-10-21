@@ -149,7 +149,8 @@ export default function transpiler(ppython_source) {
             logErrorMessage("Error: Syntax error `", raw_token, "`");
     });
 
-    cpp_source = JSON.stringify(lexical_tokens, null, "\t");
+    // cpp_source = JSON.stringify(lexical_tokens, null, "\t");
+    console.log(JSON.stringify(lexical_tokens, null, "\t"));
 
     if (cpp_source === undefined) {
         logErrorMessage("Error: No C++ source code could be produced")
