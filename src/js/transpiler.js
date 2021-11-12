@@ -21,53 +21,51 @@ export default function transpiler(ppython_source) {
     }
 
     const TokenExpressions = {
-        "Delimitador": {
+        "Delimiter": {
             "quote": /(?<!.)['"](?!.)/,
             "colon": /(?<!.)[:](?!.)/,
             "hashtag": /(?<!.)[#](?!.)/,
             "newline": /(?<!.)\n(?!.)/,
             "tab": /(?<!.)\t(?!.)/,
         },
-        "EstructuraDeIteracion": {
+        "IterationStructure": {
             "while": /(?<!.)while(?!.)/,
         },
-        "OperadorLogico": {
+        "LogicalOperator": {
             "and": /(?<!.)and(?!.)/,
             "or": /(?<!.)or(?!.)/,
         },
-        "EstructuraCondicional": {
+        "ConditionalStructure": {
             "if": /(?<!.)if(?!.)/,
             "elif": /(?<!.)elif(?!.)/,
             "else": /(?<!.)else(?!.)/,
         },
-        "FuncionAuxilliar": {
+        "FunctionAuxiliary": {
             "break": /(?<!.)break(?!.)/,
             "return": /(?<!.)return(?!.)/,
         },
-        "DelimitadorEmparejado": {
-            "parenthesis_left": /(?<!.)[(](?!.)/,
-            "parenthesis_right": /(?<!.)[)](?!.)/,
-        },
-        "OperadorDeAsignacion": {
+        "AssignmentOperator": {
             "assignment": /(?<!.)=(?!.)/,
         },
-        "OperadorDeComparacion": {
+        "ComparisonOperator": {
             "equals": /(?<!.)==(?!.)/,
             "diffrent": /(?<!.)!=(?!.)/,
             "greater": /(?<!.)[>](?!.)/,
             "lesser": /(?<!.)[<](?!.)/,
         },
-        "OperadorAritmetico": {
+        "ArhythmicOperator": {
             "addition": /(?<!.)[+](?!.)/,
             "subtraction": /(?<!.)[-](?!.)/,
             "multiplication": /(?<!.)[*](?!.)/,
             "division": /(?<!.)[/](?!.)/,
+            "parenthesis_left": /(?<!.)[(](?!.)/,
+            "parenthesis_right": /(?<!.)[)](?!.)/,
         },
         "Literal": {
             "bool": /(?<!.)True|False(?!.)/,
             "integer": /(?<!.)[0-9]+(?!.)/,
         },
-        "Identificador": {
+        "Identifier": {
             "variable_name": /(?<!.)[^0-9]\w*(?!.)/,
         }
     };
@@ -149,7 +147,7 @@ export default function transpiler(ppython_source) {
             logErrorMessage("Error: Syntax error `", raw_token, "`");
     });
 
-    // cpp_source = JSON.stringify(lexical_tokens, null, "\t");
+    cpp_source = JSON.stringify(lexical_tokens, null, "\t");
     console.log(JSON.stringify(lexical_tokens, null, "\t"));
 
     if (cpp_source === undefined) {
