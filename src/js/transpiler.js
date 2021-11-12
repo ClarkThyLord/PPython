@@ -148,11 +148,51 @@ export default function transpiler(ppython_source) {
     });
 
     cpp_source = JSON.stringify(lexical_tokens, null, "\t");
-    console.log(JSON.stringify(lexical_tokens, null, "\t"));
+
+    class SyntaxTree {
+        constructor() {
+            this.lexical_tokens = [];
+            this.syntax_trees = [];
+        }
+    }
+
+    let syntax_tree = [
+        new SyntaxTree()
+    ];
+    let sub_syntax_tree;
+
+    lexical_tokens.forEach((lexical_token, index) => {
+        const token_group = lexical_token[0];
+        const token_name = lexical_token[1];
+        const raw_token = lexical_token[2];
+
+        if (token_group === "Delimiter") {
+            if (token_name === "newline") {
+                if (lexical_tokens[index + 1][1] == "tab") {
+                    sub_syntax_tree = new SyntaxTree();
+                    syntax_tree[syntax_tree.length - 1].syntax_trees.push(sub_syntax_tree);
+                } else {
+                    syntax_tree.push(new SyntaxTree());
+                    sub_syntax_tree = undefined;
+                }
+                return;
+            } else if (token_name === "tab") {
+                return;
+            }
+        }
+
+        if (sub_syntax_tree === undefined) {
+            syntax_tree[syntax_tree.length - 1].lexical_tokens.push(lexical_token);
+        } else {
+            sub_syntax_tree.lexical_tokens.push(lexical_token);
+        }
+    });
 
     if (cpp_source === undefined) {
         logErrorMessage("Error: No C++ source code could be produced")
     }
+
+    console.log(JSON.stringify(syntax_tree, null, "\t"));
 
     return {
         result: cpp_source,
