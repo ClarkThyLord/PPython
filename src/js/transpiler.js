@@ -53,7 +53,7 @@ export default function transpiler(ppython_source) {
             "greater": /(?<!.)[>](?!.)/,
             "lesser": /(?<!.)[<](?!.)/,
         },
-        "ArhythmicOperator": {
+        "ArithmeticOperator": {
             "addition": /(?<!.)[+](?!.)/,
             "subtraction": /(?<!.)[-](?!.)/,
             "multiplication": /(?<!.)[*](?!.)/,
