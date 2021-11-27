@@ -20,6 +20,7 @@ export default {
   mounted() {
     let editor = codemirror.fromTextArea(this.$el, {
       lineNumbers: true,
+      indentWithTabs: true,
     });
     editor.on("change", (instance, changeObj) => {
       this.$emit("update:value", this.getValue());
