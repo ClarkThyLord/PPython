@@ -91,7 +91,8 @@ export default function transpiler(ppython_source) {
         .replaceAll("/", " / ")
         .split(/[ ]+/).filter(n => n);
 
-    console.log(JSON.stringify(raw_tokens));
+    console.log("RAW_TOKENS: ", raw_tokens);
+    // console.log(JSON.stringify(raw_tokens));
 
     let lexical_tokens = [];
 
@@ -148,59 +149,98 @@ export default function transpiler(ppython_source) {
             logErrorMessage("Error: Syntax error `", raw_token, "`");
     });
 
-    // cpp_source = JSON.stringify(lexical_tokens, null, "\t");
+    console.log("LEXICAL TOKENS: ", lexical_tokens);
 
-    class SyntaxTree {
-        constructor(indentation = 0) {
+    class LexicalLine {
+        constructor() {
+            this.indentation = 0;
+            this.indentation_req = 0;
             this.lexical_tokens = [];
-
-            this.indentation = indentation;
-            this.indentation_req = indentation;
-
-            this.syntax_trees = [];
-            this.parent_syntax_tree = undefined;
         }
     }
 
-    let syntax_tree = new SyntaxTree();
-    let source_tree = [syntax_tree];
-
+    let lexical_token_lines = [
+        new LexicalLine()
+    ];
     for (let lexical_token_index = 0; lexical_token_index < lexical_tokens.length; lexical_token_index++) {
         const lexical_token = lexical_tokens[lexical_token_index];
         const token_group = lexical_token[0];
         const token_name = lexical_token[1];
         const token_raw = lexical_token[2];
-
+        const lexical_token_line = lexical_token_lines[lexical_token_lines.length - 1];
         if (token_name == "newline") {
-            let indentation = 0;
-            while (lexical_token_index + indentation + 1 < lexical_tokens.length &&
-                lexical_tokens[lexical_token_index + indentation + 1][1] == "tab")
-                indentation += 1;
-
-            if (indentation == 0) {
-                syntax_tree = new SyntaxTree(indentation);
-                source_tree.push(syntax_tree);
-            } else if (indentation == syntax_tree.indentation_req) {
-                if (syntax_tree.indentation == syntax_tree.indentation_req) {
-                    let _syntax_tree = new SyntaxTree(indentation);
-                    syntax_tree.syntax_trees.push(_syntax_tree);
-                    syntax_tree = _syntax_tree;
-                } else {
-                    let _syntax_tree = new SyntaxTree(indentation);
-                    syntax_tree.syntax_trees.push(_syntax_tree);
-                    syntax_tree = _syntax_tree;
-                }
-            } else {
-                logErrorMessage("IndentationError: unexpected indent");
-                break;
+            lexical_token_lines.push(new LexicalLine());
+        } else if (token_name == "tab") {
+            lexical_token_line.indentation += 1;
+        } else {
+            if (token_group == "IterationStructure" || token_group == "ConditionalStructure") {
+                lexical_token_line.indentation_req = lexical_token_line.indentation + 1;
             }
-            continue;
-        } else if (token_group == "IterationStructure" || token_group == "LogicalOperator") {
-            syntax_tree.indentation_req = syntax_tree.indentation + 1;
+            lexical_token_line.lexical_tokens.push(lexical_token);
         }
-
-        syntax_tree.lexical_tokens.push(lexical_token);
     }
+
+    console.log("LEXICAL LINES: ", lexical_token_lines);
+    // console.log(JSON.stringify(lexical_token_lines, null, "\t"));
+
+    // let source_tree = [
+    //     [],
+    // ];
+
+    // cpp_source = JSON.stringify(lexical_tokens, null, "\t");
+
+    // class SyntaxTree {
+    //     constructor(indentation = 0) {
+    //         this.lexical_tokens = [];
+
+    //         this.indentation = indentation;
+    //         this.indentation_req = indentation;
+
+    //         this.syntax_trees = [];
+    //         this.parent_syntax_tree = undefined;
+    //     }
+    // }
+
+
+    // let syntax_tree = new SyntaxTree();
+    // let source_tree = [syntax_tree];
+
+    // for (let lexical_token_index = 0; lexical_token_index < lexical_tokens.length; lexical_token_index++) {
+    //     const lexical_token = lexical_tokens[lexical_token_index];
+    //     const token_group = lexical_token[0];
+    //     const token_name = lexical_token[1];
+    //     const token_raw = lexical_token[2];
+
+    //     if (token_name == "newline") {
+    //         let indentation = 0;
+    //         while (lexical_token_index + indentation + 1 < lexical_tokens.length &&
+    //             lexical_tokens[lexical_token_index + indentation + 1][1] == "tab")
+    //             indentation += 1;
+
+    //         if (indentation == 0) {
+    //             syntax_tree = new SyntaxTree(indentation);
+    //             source_tree.push(syntax_tree);
+    //         } else if (indentation == syntax_tree.indentation_req) {
+    //             if (syntax_tree.indentation == syntax_tree.indentation_req) {
+    //                 let _syntax_tree = new SyntaxTree(indentation);
+    //                 syntax_tree.syntax_trees.push(_syntax_tree);
+    //                 syntax_tree = _syntax_tree;
+    //             } else {
+    //                 let _syntax_tree = new SyntaxTree(indentation);
+    //                 syntax_tree.syntax_trees.push(_syntax_tree);
+    //                 syntax_tree = _syntax_tree;
+    //             }
+    //         } else {
+    //             logErrorMessage("IndentationError: unexpected indent");
+    //             break;
+    //         }
+    //         continue;
+    //     } else if (token_group == "IterationStructure" || token_group == "LogicalOperator") {
+    //         syntax_tree.indentation_req = syntax_tree.indentation + 1;
+    //     }
+
+    //     syntax_tree.lexical_tokens.push(lexical_token);
+    // }
 
     // lexical_tokens.forEach((lexical_token, index) => {
     //     const token_group = lexical_token[0];
@@ -232,9 +272,9 @@ export default function transpiler(ppython_source) {
     //     } else {
     //         sub_syntax_tree.lexical_tokens.push(lexical_token);
     //     }
-    // });
+    // // });
 
-    console.log(JSON.stringify(source_tree, null, "\t"));
+    // console.log(JSON.stringify(source_tree, null, "\t"));
 
     // cpp_source = "";
 
