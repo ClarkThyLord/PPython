@@ -156,6 +156,7 @@ export default function transpiler(ppython_source) {
 
     class SyntaxTree {
         constructor() {
+            this.is_structure = false;
             this.indentation = 0;
             this.branch_indentation = 0;
             this.branches = [];
@@ -194,6 +195,7 @@ export default function transpiler(ppython_source) {
                     (lexical_tokens[lexical_token_index + 1][0] == "IterationStructure" ||
                         lexical_tokens[lexical_token_index + 1][0] == "ConditionalStructure")) {
                     let st = new SyntaxTree();
+                    st.is_structure = true;
                     st.indentation = indentation;
                     st.branch_indentation = indentation + 1;
                     st.push(new Branch());
