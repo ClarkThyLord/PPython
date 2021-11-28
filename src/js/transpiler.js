@@ -149,6 +149,9 @@ export default function transpiler(ppython_source) {
             logErrorMessage("Error: Syntax error `", raw_token, "`");
     });
 
+    if (lexical_tokens.length > 0)
+        lexical_tokens.splice(0, 0, ["Delimiter", "newline", "\n"]);
+
     console.log("LEXICAL TOKENS: ", lexical_tokens);
 
     class LexicalLine {
