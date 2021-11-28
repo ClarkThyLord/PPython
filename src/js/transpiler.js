@@ -1,5 +1,5 @@
 export default function transpiler(ppython_source) {
-    let cpp_source = undefined;
+    let cpp_source = "";
     let logs = []
 
     const logMessage = (message) => {
@@ -241,8 +241,12 @@ export default function transpiler(ppython_source) {
     //                     break;
     //             }
     // }
+ 
+
+    let variable_declaration = [];
     ppython_to_cpp(source_tree);
     
+
     function ppython_to_cpp(node)
     {       
             if (node instanceof(SyntaxTree))
@@ -264,27 +268,20 @@ export default function transpiler(ppython_source) {
                         case "if":
                             cpp_source += "if ("
                             while (node.lexical_tokens[index + 1][1] != "colon") {
-                                index += 1;
-                                console.log("That part that breaks")
-                                console.log(node.lexical_tokens[index][1])
-                                cpp_source += " " + ppython_to_cpp(node.lexical_tokens[index][1]) + " ";
+                                index += 1; 
+                                ppython_to_cpp(node.lexical_tokens[index]);
                             }
                             cpp_source += ") {"
                             break;
-                        case "bool": 
-                            cpp_source += node.lexical_tokens[index][2] == "True" ? 1 : 0 + " ";
-                            break;
-                        case "and":
-                            cpp_source += "&&";
-                            break;
-                        case "or":
-                            cpp_source += "||";
-                            break;
-                        case "hashtag":
-                            cpp_source += "//";
-                            break;
-                        default:
-                            cpp_source += node.lexical_tokens[index][2] + " ";
+                        case "variable_name":
+                            cpp_source += "auto " + node.lexical_tokens[index][2];
+                            for (;index <= index+node.lexical_tokens.length;) {
+                                index += 1; 
+                                console.log(node.lexical_tokens[index]);
+                                ppython_to_cpp(node.lexical_tokens[index]); 
+                                break;
+                            }
+                            cpp_source += ";"
                             break;
                     } 
                 }
@@ -293,8 +290,30 @@ export default function transpiler(ppython_source) {
             else
             {
                 console.log(node)
-                cpp_source += String(node) + " ";
+                switch (node[1]) { 
+                    case "bool": 
+                        cpp_source += node[2] == "True" ? 1 : 0 + " ";
+                        break;
+                    case "and":
+                        cpp_source += " && ";
+                        break;
+                    case "or":
+                        cpp_source += " || ";
+                        break;
+                    case "hashtag":
+                        cpp_source += " // ";
+                        break;
+                    case "addition":
+                        cpp_source += node[2] + " ";
+                        break;
+                    case "subtraction":
+                        cpp_source += node[2] + " ";
+                        break;
+                    default:
+                        cpp_source += node[2] + " ";
+                        break;
             }
+        }
         
     }
                         // case "while":
@@ -510,7 +529,7 @@ export default function transpiler(ppython_source) {
     //     }
     // }
 
-    if (cpp_source === undefined) {
+    if (cpp_source === "") {
         logErrorMessage("Error: no C++ source code could be produced");
     }
 
