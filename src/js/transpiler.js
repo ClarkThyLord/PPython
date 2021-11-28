@@ -154,69 +154,130 @@ export default function transpiler(ppython_source) {
 
     console.log("LEXICAL TOKENS: ", lexical_tokens);
 
-    class LexicalLine {
+    class SyntaxTree {
         constructor() {
             this.indentation = 0;
-            this.indentation_req = 0;
-            this.lexical_tokens = [];
+            this.branch_indentation = 0;
+            this.branches = [];
+        }
+
+        push(branch) {
+            this.branches.push(branch);
         }
     }
 
-    let lexical_lines = [
-        new LexicalLine()
-    ];
+    class Branch {
+        constructor() {
+            this.lexical_tokens = [];
+        }
+
+        push(lexical_token) {
+            this.lexical_tokens.push(lexical_token);
+        }
+    }
+
+    let syntax_tree = new SyntaxTree();
+    let stack = [syntax_tree];
     for (let lexical_token_index = 0; lexical_token_index < lexical_tokens.length; lexical_token_index++) {
         const lexical_token = lexical_tokens[lexical_token_index];
         const token_group = lexical_token[0];
         const token_name = lexical_token[1];
         const token_raw = lexical_token[2];
-        const lexical_token_line = lexical_lines[lexical_lines.length - 1];
+
         if (token_name == "newline") {
-            lexical_lines.push(new LexicalLine());
-        } else if (token_name == "tab") {
-            lexical_token_line.indentation += 1;
-        } else {
-            if (token_group == "IterationStructure" || token_group == "ConditionalStructure") {
-                lexical_token_line.indentation_req = lexical_token_line.indentation + 1;
+            let indentation = 0;
+            while (lexical_tokens[lexical_token_index + indentation + 1][1] == "tab")
+                indentation += 1;
+            lexical_token_index += indentation;
+            if (indentation == stack[stack.length - 1].branch_indentation) {
+                if (lexical_token_index + 1 <= lexical_tokens.length &&
+                    (lexical_tokens[lexical_token_index + 1][0] == "IterationStructure" ||
+                        lexical_tokens[lexical_token_index + 1][0] == "ConditionalStructure")) {
+                    let st = new SyntaxTree();
+                    stack[stack.length - 1].push(st);
+                    stack.push(st);
+                } else {
+                    stack[stack.length - 1].push(new Branch());
+                }
+            } else if (stack.length > 1 && indentation < stack[stack.length - 1].branch_indentation) {
+                stack.pop();
+                lexical_token_index -= 1;
+            } else {
+                logErrorMessage("IndentationError: unexpected indent");
+                break;
             }
-            lexical_token_line.lexical_tokens.push(lexical_token);
+            continue;
         }
+
+        // stack[stack.length - 1].branches[stack[stack.length - 1].branches.length - 1].push(lexical_token);
     }
 
-    console.log("LEXICAL LINES: ", lexical_lines);
+    console.log("SYNTAX TREE: ", syntax_tree);
+    console.log(JSON.stringify(syntax_tree, null, "\t"));
 
-    class SyntaxTree {
-        constructor() {
-            this.indentation = 0;
-            this.indentation_req = 0;
-            this.branches = [];
-        }
-    }
+    // class LexicalLine {
+    //     constructor() {
+    //         this.indentation = 0;
+    //         this.indentation_req = 0;
+    //         this.lexical_tokens = [];
+    //     }
+    // }
 
-    let source_tree = new SyntaxTree();
+    // let lexical_lines = [
+    //     new LexicalLine()
+    // ];
+    // for (let lexical_token_index = 0; lexical_token_index < lexical_tokens.length; lexical_token_index++) {
+    //     const lexical_token = lexical_tokens[lexical_token_index];
+    //     const token_group = lexical_token[0];
+    //     const token_name = lexical_token[1];
+    //     const token_raw = lexical_token[2];
+    //     const lexical_token_line = lexical_lines[lexical_lines.length - 1];
+    //     if (token_name == "newline") {
+    //         lexical_lines.push(new LexicalLine());
+    //     } else if (token_name == "tab") {
+    //         lexical_token_line.indentation += 1;
+    //     } else {
+    //         if (token_group == "IterationStructure" || token_group == "ConditionalStructure") {
+    //             lexical_token_line.indentation_req = lexical_token_line.indentation + 1;
+    //         }
+    //         lexical_token_line.lexical_tokens.push(lexical_token);
+    //     }
+    // }
 
-    let stack = [
-        source_tree,
-    ];
-    for (let lexical_line_index = 0; lexical_line_index < lexical_lines.length; lexical_line_index++) {
-        const lexical_line = lexical_lines[lexical_line_index];
+    // console.log("LEXICAL LINES: ", lexical_lines);
 
-        if (lexical_line.indentation_req != stack[stack.length - 1].indentation_req) {
-            let st = new SyntaxTree();
-            st.indentation = lexical_line.indentation;
-            st.indentation_req = lexical_line.indentation_req;
-            st.branches.push(lexical_line)
-            stack[stack.length - 1].branches.push(st);
-            stack.push(st);
-        } else if (lexical_line.indentation == stack[stack.length - 1].indentation_req) {
-            stack[stack.length - 1].branches.push(lexical_line);
-        } else {
-            stack.pop();
-            lexical_line_index -= 1;
-        }
-    }
+    // class SyntaxTree {
+    //     constructor() {
+    //         this.indentation = 0;
+    //         this.indentation_req = 0;
+    //         this.branches = [];
+    //     }
+    // }
 
-    console.log("SOURCE TREE: ", source_tree);
+    // let source_tree = new SyntaxTree();
+
+    // let stack = [
+    //     source_tree,
+    // ];
+    // for (let lexical_line_index = 0; lexical_line_index < lexical_lines.length; lexical_line_index++) {
+    //     const lexical_line = lexical_lines[lexical_line_index];
+
+    //     if (lexical_line.indentation_req != stack[stack.length - 1].indentation_req) {
+    //         let st = new SyntaxTree();
+    //         st.indentation = lexical_line.indentation;
+    //         st.indentation_req = lexical_line.indentation_req;
+    //         st.branches.push(lexical_line)
+    //         stack[stack.length - 1].branches.push(st);
+    //         stack.push(st);
+    //     } else if (lexical_line.indentation == stack[stack.length - 1].indentation_req) {
+    //         stack[stack.length - 1].branches.push(lexical_line);
+    //     } else {
+    //         stack.pop();
+    //         lexical_line_index -= 1;
+    //     }
+    // }
+
+    // console.log("SOURCE TREE: ", source_tree);
     // console.log(JSON.stringify(source_tree, null, "\t"));
 
     // let source_tree = [
