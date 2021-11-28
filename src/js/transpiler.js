@@ -159,11 +159,11 @@ export default function transpiler(ppython_source) {
             this.is_structure = false;
             this.indentation = 0;
             this.branch_indentation = 0;
-            this.branches = [];
+            this.nodes = [];
         }
 
         push(branch) {
-            this.branches.push(branch);
+            this.nodes.push(branch);
         }
     }
 
@@ -177,8 +177,8 @@ export default function transpiler(ppython_source) {
         }
     }
 
-    let syntax_tree = new SyntaxTree();
-    let stack = [syntax_tree];
+    let source_tree = new SyntaxTree();
+    let stack = [source_tree];
     for (let lexical_token_index = 0; lexical_token_index < lexical_tokens.length; lexical_token_index++) {
         const lexical_token = lexical_tokens[lexical_token_index];
         const token_group = lexical_token[0];
@@ -214,11 +214,108 @@ export default function transpiler(ppython_source) {
             continue;
         }
 
-        stack[stack.length - 1].branches[stack[stack.length - 1].branches.length - 1].push(lexical_token);
+        stack[stack.length - 1].nodes[stack[stack.length - 1].nodes.length - 1].push(lexical_token);
     }
 
-    console.log("SYNTAX TREE: ", syntax_tree);
-    console.log(JSON.stringify(syntax_tree, null, "\t"));
+    // console.log("SYNTAX TREE: ", source_tree);
+    // console.log(JSON.stringify(source_tree, null, "\t"));
+    
+    // for (let index = 0; index < source_tree.length; index++) { 
+    //     switch (token_name) {
+    //                 case "while":
+    //                     cpp_source += "while ("
+    //                     while (lexical_tokens[index + 1][1] != "colon") {
+    //                         index += 1;
+    //                         cpp_source += " " + ppython_to_cpp(lexical_tokens[index]) + " ";
+    //                     }
+    //                     cpp_source += ") {"
+    //                     break;
+
+    //                 case "if":
+    //                     cpp_source += "if ("
+    //                     while (lexical_tokens[index + 1][1] != "colon") {
+    //                         index += 1;
+    //                         cpp_source += " " + ppython_to_cpp(lexical_tokens[index]) + " ";
+    //                     }
+    //                     cpp_source += ") {"
+    //                     break;
+    //             }
+    // }
+    ppython_to_cpp(source_tree);
+    
+    function ppython_to_cpp(node)
+    {       
+            if (node instanceof(SyntaxTree))
+            {
+                console.log("ENTERED SYNTAXTREE")
+                console.log(node)
+                console.log(node.nodes) 
+                for (let index = 0; index < node.nodes.length; index++) { 
+                    ppython_to_cpp(node.nodes[index])
+                } 
+            } 
+            else if (node instanceof(Branch))
+            {
+                console.log("ENTERED BRANCH")
+                console.log(node)
+                for (let index = 0; index < node.lexical_tokens.length; index++) {
+                    //console.log(node.lexical_tokens[index][1])
+                    switch (node.lexical_tokens[index][1]) {
+                        case "if":
+                            cpp_source += "if ("
+                            while (node.lexical_tokens[index + 1][1] != "colon") {
+                                index += 1;
+                                console.log("That part that breaks")
+                                console.log(node.lexical_tokens[index][1])
+                                cpp_source += " " + ppython_to_cpp(node.lexical_tokens[index][1]) + " ";
+                            }
+                            cpp_source += ") {"
+                            break;
+                        case "bool": 
+                            cpp_source += node.lexical_tokens[index][2] == "True" ? 1 : 0 + " ";
+                            break;
+                        case "and":
+                            cpp_source += "&&";
+                            break;
+                        case "or":
+                            cpp_source += "||";
+                            break;
+                        case "hashtag":
+                            cpp_source += "//";
+                            break;
+                        default:
+                            cpp_source += node.lexical_tokens[index][2] + " ";
+                            break;
+                    } 
+                }
+                cpp_source += "\n";
+                }
+            else
+            {
+                console.log(node)
+                cpp_source += String(node) + " ";
+            }
+        
+    }
+                        // case "while":
+                        //     cpp_source += "while ("
+                        //     while (lexical_tokens[index + 1][1] != "colon") {
+                        //         index += 1;
+                        //         cpp_source += " " + ppython_to_cpp(lexical_tokens[index]) + " ";
+                        //     }
+                        //     cpp_source += ") {"
+                        //     break;
+    
+                        // case "if":
+                        //     cpp_source += "if ("
+                        //     while (lexical_tokens[index + 1][1] != "colon") {
+                        //         index += 1;
+                        //         cpp_source += " " + ppython_to_cpp(lexical_tokens[index]) + " ";
+                        //     }
+                        //     cpp_source += ") {"
+                        //     break;
+
+
 
     // class LexicalLine {
     //     constructor() {
@@ -255,7 +352,7 @@ export default function transpiler(ppython_source) {
     //     constructor() {
     //         this.indentation = 0;
     //         this.indentation_req = 0;
-    //         this.branches = [];
+    //         this.nodes = [];
     //     }
     // }
 
@@ -271,11 +368,11 @@ export default function transpiler(ppython_source) {
     //         let st = new SyntaxTree();
     //         st.indentation = lexical_line.indentation;
     //         st.indentation_req = lexical_line.indentation_req;
-    //         st.branches.push(lexical_line)
-    //         stack[stack.length - 1].branches.push(st);
+    //         st.nodes.push(lexical_line)
+    //         stack[stack.length - 1].nodes.push(st);
     //         stack.push(st);
     //     } else if (lexical_line.indentation == stack[stack.length - 1].indentation_req) {
-    //         stack[stack.length - 1].branches.push(lexical_line);
+    //         stack[stack.length - 1].nodes.push(lexical_line);
     //     } else {
     //         stack.pop();
     //         lexical_line_index -= 1;
