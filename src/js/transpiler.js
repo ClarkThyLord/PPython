@@ -159,7 +159,7 @@ export default function transpiler(ppython_source) {
         }
     }
 
-    let lexical_token_lines = [
+    let lexical_lines = [
         new LexicalLine()
     ];
     for (let lexical_token_index = 0; lexical_token_index < lexical_tokens.length; lexical_token_index++) {
@@ -167,9 +167,9 @@ export default function transpiler(ppython_source) {
         const token_group = lexical_token[0];
         const token_name = lexical_token[1];
         const token_raw = lexical_token[2];
-        const lexical_token_line = lexical_token_lines[lexical_token_lines.length - 1];
+        const lexical_token_line = lexical_lines[lexical_lines.length - 1];
         if (token_name == "newline") {
-            lexical_token_lines.push(new LexicalLine());
+            lexical_lines.push(new LexicalLine());
         } else if (token_name == "tab") {
             lexical_token_line.indentation += 1;
         } else {
@@ -180,8 +180,41 @@ export default function transpiler(ppython_source) {
         }
     }
 
-    console.log("LEXICAL LINES: ", lexical_token_lines);
-    // console.log(JSON.stringify(lexical_token_lines, null, "\t"));
+    console.log("LEXICAL LINES: ", lexical_lines);
+
+    class SyntaxTree {
+        constructor() {
+            this.indentation = 0;
+            this.indentation_req = 0;
+            this.branches = [];
+        }
+    }
+
+    let source_tree = new SyntaxTree();
+
+    let stack = [
+        source_tree,
+    ];
+    for (let lexical_line_index = 0; lexical_line_index < lexical_lines.length; lexical_line_index++) {
+        const lexical_line = lexical_lines[lexical_line_index];
+
+        if (lexical_line.indentation_req != stack[stack.length - 1].indentation_req) {
+            let st = new SyntaxTree();
+            st.indentation = lexical_line.indentation;
+            st.indentation_req = lexical_line.indentation_req;
+            st.branches.push(lexical_line)
+            stack[stack.length - 1].branches.push(st);
+            stack.push(st);
+        } else if (lexical_line.indentation == stack[stack.length - 1].indentation_req) {
+            stack[stack.length - 1].branches.push(lexical_line);
+        } else {
+            stack.pop();
+            lexical_line_index -= 1;
+        }
+    }
+
+    console.log("SOURCE TREE: ", source_tree);
+    // console.log(JSON.stringify(source_tree, null, "\t"));
 
     // let source_tree = [
     //     [],
