@@ -194,6 +194,9 @@ export default function transpiler(ppython_source) {
                     (lexical_tokens[lexical_token_index + 1][0] == "IterationStructure" ||
                         lexical_tokens[lexical_token_index + 1][0] == "ConditionalStructure")) {
                     let st = new SyntaxTree();
+                    st.indentation = indentation;
+                    st.branch_indentation = indentation + 1;
+                    st.push(new Branch());
                     stack[stack.length - 1].push(st);
                     stack.push(st);
                 } else {
@@ -209,7 +212,7 @@ export default function transpiler(ppython_source) {
             continue;
         }
 
-        // stack[stack.length - 1].branches[stack[stack.length - 1].branches.length - 1].push(lexical_token);
+        stack[stack.length - 1].branches[stack[stack.length - 1].branches.length - 1].push(lexical_token);
     }
 
     console.log("SYNTAX TREE: ", syntax_tree);
