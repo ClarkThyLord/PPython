@@ -257,11 +257,6 @@ export default function transpiler(ppython_source) {
                         cpp_source += "\t".repeat(index==0 ? node.indentation:node.branch_indentation);
                     }
                     ppython_to_cpp(node.nodes[index])
-                    
-                    // if (node.branch_indentation > 0 )
-                    //     cpp_source += "}"
-                    // console.log(source_tree) 
-                    // console.log(node[2])
                 }
                 if(node.is_structure){
                     cpp_source += "\t".repeat(node.indentation) + "}\n";
@@ -289,6 +284,17 @@ export default function transpiler(ppython_source) {
                             }
                             cpp_source += ") {" 
                             break;
+                        case "elif":
+                                cpp_source += "elif ("
+                                while (node.lexical_tokens[index + 1][1] != "colon") {
+                                    index += 1; 
+                                    ppython_to_cpp(node.lexical_tokens[index]);
+                                }
+                                cpp_source += ") {" 
+                                break;
+                        case "else":
+                                cpp_source += "else {"
+                                break;
                         case "variable_name":
                             cpp_source += "auto " + node.lexical_tokens[index][2];
                             for (;index < node.lexical_tokens.length-1;) {
@@ -296,6 +302,13 @@ export default function transpiler(ppython_source) {
                                 ppython_to_cpp(node.lexical_tokens[index]);  
                             }
                             cpp_source += ";"
+                            break;
+                        case "hashtag":
+                            cpp_source += "//";
+                            for (;index < node.lexical_tokens.length-1;) {
+                                index += 1;
+                                cpp_source += node.lexical_tokens[index][2];
+                            }
                             break;
                     } 
                 }
@@ -315,7 +328,7 @@ export default function transpiler(ppython_source) {
                         cpp_source += " || ";
                         break;
                     case "hashtag":
-                        cpp_source += " // ";
+                        cpp_source += "// ";
                         break;
                     case "addition":
                         cpp_source += node[2] + " ";
