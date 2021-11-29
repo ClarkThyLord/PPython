@@ -251,17 +251,25 @@ export default function transpiler(ppython_source) {
     {       
             if (node instanceof(SyntaxTree))
             {
-                console.log("ENTERED SYNTAXTREE")
-                console.log(node)
-                console.log(node.nodes) 
+                console.log("ENTERED SYNTAXTREE") 
                 for (let index = 0; index < node.nodes.length; index++) { 
+                    if(node.is_structure && !node.nodes[index].is_structure){
+                        cpp_source += "\t".repeat(index==0 ? node.indentation:node.branch_indentation);
+                    }
                     ppython_to_cpp(node.nodes[index])
-                } 
+                    
+                    // if (node.branch_indentation > 0 )
+                    //     cpp_source += "}"
+                    // console.log(source_tree) 
+                    // console.log(node[2])
+                }
+                if(node.is_structure){
+                    cpp_source += "\t".repeat(node.indentation) + "}\n";
+                }
             } 
             else if (node instanceof(Branch))
             {
-                console.log("ENTERED BRANCH")
-                console.log(node)
+                console.log("ENTERED BRANCH") 
                 for (let index = 0; index < node.lexical_tokens.length; index++) {
                     //console.log(node.lexical_tokens[index][1])
                     switch (node.lexical_tokens[index][1]) {
@@ -271,15 +279,21 @@ export default function transpiler(ppython_source) {
                                 index += 1; 
                                 ppython_to_cpp(node.lexical_tokens[index]);
                             }
-                            cpp_source += ") {"
+                            cpp_source += ") {" 
+                            break;
+                        case "while":
+                            cpp_source += "while ("
+                            while (node.lexical_tokens[index + 1][1] != "colon") {
+                                index += 1; 
+                                ppython_to_cpp(node.lexical_tokens[index]);
+                            }
+                            cpp_source += ") {" 
                             break;
                         case "variable_name":
                             cpp_source += "auto " + node.lexical_tokens[index][2];
-                            for (;index <= index+node.lexical_tokens.length;) {
-                                index += 1; 
-                                console.log(node.lexical_tokens[index]);
-                                ppython_to_cpp(node.lexical_tokens[index]); 
-                                break;
+                            for (;index < node.lexical_tokens.length-1;) {
+                                index += 1;
+                                ppython_to_cpp(node.lexical_tokens[index]);  
                             }
                             cpp_source += ";"
                             break;
