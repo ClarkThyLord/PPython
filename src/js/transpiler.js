@@ -290,6 +290,7 @@ export default function transpiler(ppython_source) {
                         cpp_source += "auto " + node.lexical_tokens[index][2];
                         for (; index < node.lexical_tokens.length - 1;) {
                             index += 1;
+                            cpp_source += index < node.lexical_tokens.length ? " " : "";
                             ppython_to_cpp(node.lexical_tokens[index]);
                         }
                         cpp_source += ";"
