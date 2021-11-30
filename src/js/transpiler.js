@@ -208,7 +208,7 @@ export default function transpiler(ppython_source) {
                 }
             } else if (stack.length > 1 && indentation < stack[stack.length - 1].branch_indentation) {
                 stack.pop();
-                while (lexical_tokens[lexical_token_index + 1][2] != "\n")
+                while (lexical_tokens[lexical_token_index + 1][1] != "newline")
                     lexical_token_index -= 1;
             } else {
                 logErrorMessage("IndentationError: unexpected indent");
@@ -322,6 +322,8 @@ export default function transpiler(ppython_source) {
     }
     if (cpp_source.length === 0) {
         cpp_source = "No c++ source code could be produced...";
+    } else {
+        cpp_source = cpp_source.substring(0, cpp_source.length - 1);
     }
 
     return {
