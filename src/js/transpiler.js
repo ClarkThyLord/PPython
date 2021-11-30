@@ -87,6 +87,7 @@ export default function transpiler(ppython_source) {
         .replaceAll("!=", " != ")
         .replaceAll("=", " = ")
         .replaceAll("=  =", "==")
+        .replaceAll("!  =", "!=")
         .replaceAll("*", " * ")
         .replaceAll("+", " + ")
         .replaceAll("-", " - ")
@@ -147,7 +148,7 @@ export default function transpiler(ppython_source) {
                 return true;
         });
         if (!match)
-            logErrorMessage("Error: Syntax error `", raw_token, "`");
+            logErrorMessage("NameError: name '" + raw_token + "' is not defined");
     });
 
     if (lexical_tokens.length > 0)
