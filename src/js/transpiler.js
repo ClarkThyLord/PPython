@@ -234,16 +234,23 @@ export default function transpiler(ppython_source) {
         } else if (node instanceof(Branch)) {
             for (let index = 0; index < node.lexical_tokens.length; index++) {
                 switch (node.lexical_tokens[index][1]) {
-                    case "if":
-                        cpp_source += "if ("
+                    case "hashtag":
+                        cpp_source += "//";
+                        for (; index < node.lexical_tokens.length - 1;) {
+                            index += 1;
+                            cpp_source += node.lexical_tokens[index][2];
+                        }
+                        break;
+                    case "while":
+                        cpp_source += "while ("
                         while (node.lexical_tokens[index + 1][1] != "colon") {
                             index += 1;
                             ppython_to_cpp(node.lexical_tokens[index]);
                         }
                         cpp_source += ") {"
                         break;
-                    case "while":
-                        cpp_source += "while ("
+                    case "if":
+                        cpp_source += "if ("
                         while (node.lexical_tokens[index + 1][1] != "colon") {
                             index += 1;
                             ppython_to_cpp(node.lexical_tokens[index]);
@@ -261,6 +268,17 @@ export default function transpiler(ppython_source) {
                     case "else":
                         cpp_source += "else {"
                         break;
+                    case "break":
+                        cpp_source += "break;";
+                        break;
+                    case "return":
+                        cpp_source += "return ";
+                        for (; index < node.lexical_tokens.length - 1;) {
+                            index += 1;
+                            ppython_to_cpp(node.lexical_tokens[index]);
+                        }
+                        cpp_source += ";"
+                        break;
                     case "variable_name":
                         cpp_source += "auto " + node.lexical_tokens[index][2];
                         for (; index < node.lexical_tokens.length - 1;) {
@@ -269,38 +287,22 @@ export default function transpiler(ppython_source) {
                         }
                         cpp_source += ";"
                         break;
-                    case "hashtag":
-                        cpp_source += "//";
-                        for (; index < node.lexical_tokens.length - 1;) {
-                            index += 1;
-                            cpp_source += node.lexical_tokens[index][2];
-                        }
-                        break;
                 }
             }
             cpp_source += "\n";
         } else {
             switch (node[1]) {
-                case "bool":
-                    cpp_source += node[2] == "True" ? 1 : 0 + " ";
-                    break;
                 case "and":
-                    cpp_source += " && ";
+                    cpp_source += "&&";
                     break;
                 case "or":
-                    cpp_source += " || ";
+                    cpp_source += "||";
                     break;
-                case "hashtag":
-                    cpp_source += "// ";
-                    break;
-                case "addition":
-                    cpp_source += node[2] + " ";
-                    break;
-                case "subtraction":
-                    cpp_source += node[2] + " ";
+                case "bool":
+                    cpp_source += node[2] == "True" ? 1 : 0;
                     break;
                 default:
-                    cpp_source += node[2] + " ";
+                    cpp_source += node[2];
                     break;
             }
         }
