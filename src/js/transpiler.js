@@ -94,6 +94,9 @@ export default function transpiler(ppython_source) {
         .replaceAll("/", " / ")
         .split(/[ ]+/).filter(n => n);
 
+    if (raw_tokens.length > 0)
+        raw_tokens.splice(0, 0, "\n");
+
     console.log("RAW_TOKENS: ", raw_tokens);
 
     let lexical_tokens = [];
@@ -151,9 +154,6 @@ export default function transpiler(ppython_source) {
             logErrorMessage("NameError: name '" + raw_token + "' is not defined");
     });
 
-    if (lexical_tokens.length > 0)
-        lexical_tokens.splice(0, 0, ["Delimiter", "newline", "\n"]);
-
     console.log("LEXICAL TOKENS: ", lexical_tokens);
 
     class SyntaxTree {
@@ -208,7 +208,8 @@ export default function transpiler(ppython_source) {
                 }
             } else if (stack.length > 1 && indentation < stack[stack.length - 1].branch_indentation) {
                 stack.pop();
-                lexical_token_index -= 1;
+                while (lexical_tokens[lexical_token_index + 1][2] != "\n")
+                    lexical_token_index -= 1;
             } else {
                 logErrorMessage("IndentationError: unexpected indent");
                 break;
@@ -220,6 +221,7 @@ export default function transpiler(ppython_source) {
     }
 
     console.log("SOURCE TREE: ", source_tree);
+    console.log("SOURCE TREE: ", JSON.stringify(source_tree, null, " "));
 
     function ppython_to_cpp(node) {
         if (node instanceof(SyntaxTree)) {
