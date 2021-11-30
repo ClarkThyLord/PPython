@@ -92,7 +92,6 @@ export default function transpiler(ppython_source) {
         .split(/[ ]+/).filter(n => n);
 
     console.log("RAW_TOKENS: ", raw_tokens);
-    // console.log(JSON.stringify(raw_tokens));
 
     let lexical_tokens = [];
 
@@ -217,346 +216,97 @@ export default function transpiler(ppython_source) {
         stack[stack.length - 1].nodes[stack[stack.length - 1].nodes.length - 1].push(lexical_token);
     }
 
-    // console.log("SYNTAX TREE: ", source_tree);
-    // console.log(JSON.stringify(source_tree, null, "\t"));
-    
-    // for (let index = 0; index < source_tree.length; index++) { 
-    //     switch (token_name) {
-    //                 case "while":
-    //                     cpp_source += "while ("
-    //                     while (lexical_tokens[index + 1][1] != "colon") {
-    //                         index += 1;
-    //                         cpp_source += " " + ppython_to_cpp(lexical_tokens[index]) + " ";
-    //                     }
-    //                     cpp_source += ") {"
-    //                     break;
+    console.log("SOURCE TREE: ", source_tree);
 
-    //                 case "if":
-    //                     cpp_source += "if ("
-    //                     while (lexical_tokens[index + 1][1] != "colon") {
-    //                         index += 1;
-    //                         cpp_source += " " + ppython_to_cpp(lexical_tokens[index]) + " ";
-    //                     }
-    //                     cpp_source += ") {"
-    //                     break;
-    //             }
-    // }
- 
-
-    let variable_declaration = [];
-    ppython_to_cpp(source_tree);
-    
-
-    function ppython_to_cpp(node)
-    {       
-            if (node instanceof(SyntaxTree))
-            {
-                console.log("ENTERED SYNTAXTREE") 
-                for (let index = 0; index < node.nodes.length; index++) { 
-                    if(node.is_structure && !node.nodes[index].is_structure){
-                        cpp_source += "\t".repeat(index==0 ? node.indentation:node.branch_indentation);
-                    }
-                    ppython_to_cpp(node.nodes[index])
+    function ppython_to_cpp(node) {
+        if (node instanceof(SyntaxTree)) {
+            for (let index = 0; index < node.nodes.length; index++) {
+                if (node.is_structure && !node.nodes[index].is_structure) {
+                    cpp_source += "\t".repeat(index == 0 ? node.indentation : node.branch_indentation);
                 }
-                if(node.is_structure){
-                    cpp_source += "\t".repeat(node.indentation) + "}\n";
-                }
-            } 
-            else if (node instanceof(Branch))
-            {
-                console.log("ENTERED BRANCH") 
-                for (let index = 0; index < node.lexical_tokens.length; index++) {
-                    //console.log(node.lexical_tokens[index][1])
-                    switch (node.lexical_tokens[index][1]) {
-                        case "if":
-                            cpp_source += "if ("
-                            while (node.lexical_tokens[index + 1][1] != "colon") {
-                                index += 1; 
-                                ppython_to_cpp(node.lexical_tokens[index]);
-                            }
-                            cpp_source += ") {" 
-                            break;
-                        case "while":
-                            cpp_source += "while ("
-                            while (node.lexical_tokens[index + 1][1] != "colon") {
-                                index += 1; 
-                                ppython_to_cpp(node.lexical_tokens[index]);
-                            }
-                            cpp_source += ") {" 
-                            break;
-                        case "elif":
-                                cpp_source += "elif ("
-                                while (node.lexical_tokens[index + 1][1] != "colon") {
-                                    index += 1; 
-                                    ppython_to_cpp(node.lexical_tokens[index]);
-                                }
-                                cpp_source += ") {" 
-                                break;
-                        case "else":
-                                cpp_source += "else {"
-                                break;
-                        case "variable_name":
-                            cpp_source += "auto " + node.lexical_tokens[index][2];
-                            for (;index < node.lexical_tokens.length-1;) {
-                                index += 1;
-                                ppython_to_cpp(node.lexical_tokens[index]);  
-                            }
-                            cpp_source += ";"
-                            break;
-                        case "hashtag":
-                            cpp_source += "//";
-                            for (;index < node.lexical_tokens.length-1;) {
-                                index += 1;
-                                cpp_source += node.lexical_tokens[index][2];
-                            }
-                            break;
-                    } 
-                }
-                cpp_source += "\n";
-                }
-            else
-            {
-                console.log(node)
-                switch (node[1]) { 
-                    case "bool": 
-                        cpp_source += node[2] == "True" ? 1 : 0 + " ";
+                ppython_to_cpp(node.nodes[index])
+            }
+            if (node.is_structure) {
+                cpp_source += "\t".repeat(node.indentation) + "}\n";
+            }
+        } else if (node instanceof(Branch)) {
+            for (let index = 0; index < node.lexical_tokens.length; index++) {
+                switch (node.lexical_tokens[index][1]) {
+                    case "if":
+                        cpp_source += "if ("
+                        while (node.lexical_tokens[index + 1][1] != "colon") {
+                            index += 1;
+                            ppython_to_cpp(node.lexical_tokens[index]);
+                        }
+                        cpp_source += ") {"
                         break;
-                    case "and":
-                        cpp_source += " && ";
+                    case "while":
+                        cpp_source += "while ("
+                        while (node.lexical_tokens[index + 1][1] != "colon") {
+                            index += 1;
+                            ppython_to_cpp(node.lexical_tokens[index]);
+                        }
+                        cpp_source += ") {"
                         break;
-                    case "or":
-                        cpp_source += " || ";
+                    case "elif":
+                        cpp_source += "elif ("
+                        while (node.lexical_tokens[index + 1][1] != "colon") {
+                            index += 1;
+                            ppython_to_cpp(node.lexical_tokens[index]);
+                        }
+                        cpp_source += ") {"
+                        break;
+                    case "else":
+                        cpp_source += "else {"
+                        break;
+                    case "variable_name":
+                        cpp_source += "auto " + node.lexical_tokens[index][2];
+                        for (; index < node.lexical_tokens.length - 1;) {
+                            index += 1;
+                            ppython_to_cpp(node.lexical_tokens[index]);
+                        }
+                        cpp_source += ";"
                         break;
                     case "hashtag":
-                        cpp_source += "// ";
+                        cpp_source += "//";
+                        for (; index < node.lexical_tokens.length - 1;) {
+                            index += 1;
+                            cpp_source += node.lexical_tokens[index][2];
+                        }
                         break;
-                    case "addition":
-                        cpp_source += node[2] + " ";
-                        break;
-                    case "subtraction":
-                        cpp_source += node[2] + " ";
-                        break;
-                    default:
-                        cpp_source += node[2] + " ";
-                        break;
+                }
+            }
+            cpp_source += "\n";
+        } else {
+            switch (node[1]) {
+                case "bool":
+                    cpp_source += node[2] == "True" ? 1 : 0 + " ";
+                    break;
+                case "and":
+                    cpp_source += " && ";
+                    break;
+                case "or":
+                    cpp_source += " || ";
+                    break;
+                case "hashtag":
+                    cpp_source += "// ";
+                    break;
+                case "addition":
+                    cpp_source += node[2] + " ";
+                    break;
+                case "subtraction":
+                    cpp_source += node[2] + " ";
+                    break;
+                default:
+                    cpp_source += node[2] + " ";
+                    break;
             }
         }
-        
     }
-                        // case "while":
-                        //     cpp_source += "while ("
-                        //     while (lexical_tokens[index + 1][1] != "colon") {
-                        //         index += 1;
-                        //         cpp_source += " " + ppython_to_cpp(lexical_tokens[index]) + " ";
-                        //     }
-                        //     cpp_source += ") {"
-                        //     break;
-    
-                        // case "if":
-                        //     cpp_source += "if ("
-                        //     while (lexical_tokens[index + 1][1] != "colon") {
-                        //         index += 1;
-                        //         cpp_source += " " + ppython_to_cpp(lexical_tokens[index]) + " ";
-                        //     }
-                        //     cpp_source += ") {"
-                        //     break;
 
+    ppython_to_cpp(source_tree);
 
-
-    // class LexicalLine {
-    //     constructor() {
-    //         this.indentation = 0;
-    //         this.indentation_req = 0;
-    //         this.lexical_tokens = [];
-    //     }
-    // }
-
-    // let lexical_lines = [
-    //     new LexicalLine()
-    // ];
-    // for (let lexical_token_index = 0; lexical_token_index < lexical_tokens.length; lexical_token_index++) {
-    //     const lexical_token = lexical_tokens[lexical_token_index];
-    //     const token_group = lexical_token[0];
-    //     const token_name = lexical_token[1];
-    //     const token_raw = lexical_token[2];
-    //     const lexical_token_line = lexical_lines[lexical_lines.length - 1];
-    //     if (token_name == "newline") {
-    //         lexical_lines.push(new LexicalLine());
-    //     } else if (token_name == "tab") {
-    //         lexical_token_line.indentation += 1;
-    //     } else {
-    //         if (token_group == "IterationStructure" || token_group == "ConditionalStructure") {
-    //             lexical_token_line.indentation_req = lexical_token_line.indentation + 1;
-    //         }
-    //         lexical_token_line.lexical_tokens.push(lexical_token);
-    //     }
-    // }
-
-    // console.log("LEXICAL LINES: ", lexical_lines);
-
-    // class SyntaxTree {
-    //     constructor() {
-    //         this.indentation = 0;
-    //         this.indentation_req = 0;
-    //         this.nodes = [];
-    //     }
-    // }
-
-    // let source_tree = new SyntaxTree();
-
-    // let stack = [
-    //     source_tree,
-    // ];
-    // for (let lexical_line_index = 0; lexical_line_index < lexical_lines.length; lexical_line_index++) {
-    //     const lexical_line = lexical_lines[lexical_line_index];
-
-    //     if (lexical_line.indentation_req != stack[stack.length - 1].indentation_req) {
-    //         let st = new SyntaxTree();
-    //         st.indentation = lexical_line.indentation;
-    //         st.indentation_req = lexical_line.indentation_req;
-    //         st.nodes.push(lexical_line)
-    //         stack[stack.length - 1].nodes.push(st);
-    //         stack.push(st);
-    //     } else if (lexical_line.indentation == stack[stack.length - 1].indentation_req) {
-    //         stack[stack.length - 1].nodes.push(lexical_line);
-    //     } else {
-    //         stack.pop();
-    //         lexical_line_index -= 1;
-    //     }
-    // }
-
-    // console.log("SOURCE TREE: ", source_tree);
-    // console.log(JSON.stringify(source_tree, null, "\t"));
-
-    // let source_tree = [
-    //     [],
-    // ];
-
-    // cpp_source = JSON.stringify(lexical_tokens, null, "\t");
-
-    // class SyntaxTree {
-    //     constructor(indentation = 0) {
-    //         this.lexical_tokens = [];
-
-    //         this.indentation = indentation;
-    //         this.indentation_req = indentation;
-
-    //         this.syntax_trees = [];
-    //         this.parent_syntax_tree = undefined;
-    //     }
-    // }
-
-
-    // let syntax_tree = new SyntaxTree();
-    // let source_tree = [syntax_tree];
-
-    // for (let lexical_token_index = 0; lexical_token_index < lexical_tokens.length; lexical_token_index++) {
-    //     const lexical_token = lexical_tokens[lexical_token_index];
-    //     const token_group = lexical_token[0];
-    //     const token_name = lexical_token[1];
-    //     const token_raw = lexical_token[2];
-
-    //     if (token_name == "newline") {
-    //         let indentation = 0;
-    //         while (lexical_token_index + indentation + 1 < lexical_tokens.length &&
-    //             lexical_tokens[lexical_token_index + indentation + 1][1] == "tab")
-    //             indentation += 1;
-
-    //         if (indentation == 0) {
-    //             syntax_tree = new SyntaxTree(indentation);
-    //             source_tree.push(syntax_tree);
-    //         } else if (indentation == syntax_tree.indentation_req) {
-    //             if (syntax_tree.indentation == syntax_tree.indentation_req) {
-    //                 let _syntax_tree = new SyntaxTree(indentation);
-    //                 syntax_tree.syntax_trees.push(_syntax_tree);
-    //                 syntax_tree = _syntax_tree;
-    //             } else {
-    //                 let _syntax_tree = new SyntaxTree(indentation);
-    //                 syntax_tree.syntax_trees.push(_syntax_tree);
-    //                 syntax_tree = _syntax_tree;
-    //             }
-    //         } else {
-    //             logErrorMessage("IndentationError: unexpected indent");
-    //             break;
-    //         }
-    //         continue;
-    //     } else if (token_group == "IterationStructure" || token_group == "LogicalOperator") {
-    //         syntax_tree.indentation_req = syntax_tree.indentation + 1;
-    //     }
-
-    //     syntax_tree.lexical_tokens.push(lexical_token);
-    // }
-
-    // lexical_tokens.forEach((lexical_token, index) => {
-    //     const token_group = lexical_token[0];
-    //     const token_name = lexical_token[1];
-    //     const raw_token = lexical_token[2];
-
-    //     if (token_group === "Delimiter") {
-    //         if (token_name === "newline") {
-    //             source_tree.push(new SyntaxTree());
-    //             sub_syntax_tree = undefined;
-    //             // if (lexical_tokens[index + 1][1] == "tab") {
-    //             //     sub_syntax_tree = new SyntaxTree();
-    //             //     source_tree[source_tree.length - 1].syntax_trees.push(sub_syntax_tree);
-    //             // } else {
-    //             //     source_tree.push(new SyntaxTree());
-    //             //     sub_syntax_tree = undefined;
-    //             // }
-    //             return;
-    //         } else if (token_name === "tab") {
-    //             tab_count -= 1;
-    //             return;
-    //         }
-    //     } else if (token_group == "IterationStructure" || token_group == "ConditionalStructure") {
-    //         source_tree[source_tree.length - 1].indentation += 1;
-    //     }
-
-    //     if (sub_syntax_tree === undefined) {
-    //         source_tree[source_tree.length - 1].lexical_tokens.push(lexical_token);
-    //     } else {
-    //         sub_syntax_tree.lexical_tokens.push(lexical_token);
-    //     }
-    // // });
-
-    // console.log(JSON.stringify(source_tree, null, "\t"));
-
-    // cpp_source = "";
-
-    // function ppython_to_cpp(lexical_token) {
-    //     switch (lexical_token[1]) {
-    //         case "and":
-    //             return "&&";
-    //         case "or":
-    //             return "||";
-    //         case "bool":
-    //             return lexical_token[2] == "True" ? 1 : 0;
-
-    //         default:
-    //             return lexical_token[2];
-    //     }
-    // }
-
-    // let level = 0;
-    // let scope = 0;
-    // for (let index = 0; index < lexical_tokens.length; index++) {
-    //     const token_group = lexical_tokens[index][0];
-    //     const token_name = lexical_tokens[index][1];
-    //     const raw_token = lexical_tokens[index][2];
-
-    //     switch (token_name) {
-    //         case "while":
-    //             cpp_source += "while ("
-    //             while (lexical_tokens[index + 1][1] != "colon") {
-    //                 index += 1;
-    //                 cpp_source += " " + ppython_to_cpp(lexical_tokens[index]) + " ";
-    //             }
-    //             cpp_source += ") {"
-    //             break;
-    //     }
-    // }
-
-    if (cpp_source === "") {
+    if (cpp_source.length === 0) {
         logErrorMessage("Error: no C++ source code could be produced");
     }
 
