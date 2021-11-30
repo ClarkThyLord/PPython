@@ -246,6 +246,7 @@ export default function transpiler(ppython_source) {
                         cpp_source += "while ("
                         while (node.lexical_tokens[index + 1][1] != "colon") {
                             index += 1;
+                            cpp_source += (1 < index && index < node.lexical_tokens.length) ? " " : "";
                             ppython_to_cpp(node.lexical_tokens[index]);
                         }
                         cpp_source += ") {"
@@ -254,14 +255,16 @@ export default function transpiler(ppython_source) {
                         cpp_source += "if ("
                         while (node.lexical_tokens[index + 1][1] != "colon") {
                             index += 1;
+                            cpp_source += (1 < index && index < node.lexical_tokens.length) ? " " : "";
                             ppython_to_cpp(node.lexical_tokens[index]);
                         }
                         cpp_source += ") {"
                         break;
                     case "elif":
-                        cpp_source += "elif ("
+                        cpp_source += "else if ("
                         while (node.lexical_tokens[index + 1][1] != "colon") {
                             index += 1;
+                            cpp_source += (1 < index && index < node.lexical_tokens.length) ? " " : "";
                             ppython_to_cpp(node.lexical_tokens[index]);
                         }
                         cpp_source += ") {"
@@ -276,6 +279,7 @@ export default function transpiler(ppython_source) {
                         cpp_source += "return ";
                         for (; index < node.lexical_tokens.length - 1;) {
                             index += 1;
+                            cpp_source += (1 < index && index < node.lexical_tokens.length) ? " " : "";
                             ppython_to_cpp(node.lexical_tokens[index]);
                         }
                         cpp_source += ";"
