@@ -1,6 +1,7 @@
 export default function transpiler(ppython_source) {
     let cpp_source = "";
     let logs = []
+    let fail = false;
 
     const logMessage = (message) => {
         logs.push({
@@ -12,6 +13,7 @@ export default function transpiler(ppython_source) {
             isError: true,
             message: message
         })
+        fail = true;
     }
     const logWarningMessage = (message) => {
         logs.push({
@@ -306,8 +308,11 @@ export default function transpiler(ppython_source) {
 
     ppython_to_cpp(source_tree);
 
+    if (fail) {
+        cpp_source = "";
+    }
     if (cpp_source.length === 0) {
-        logErrorMessage("Error: no C++ source code could be produced");
+        cpp_source = "No c++ source code could be produced...";
     }
 
     return {
