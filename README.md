@@ -1,5 +1,5 @@
 <p align="center">
-	<a>
+	<a href="https://github.com/ClarkThyLord/PPython">
 		<img width="128px" src="./public/ppython.svg?sanitize=true" alt="" />
 		<h1 align="center">
 			PPython
